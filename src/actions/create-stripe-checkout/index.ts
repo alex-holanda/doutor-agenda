@@ -1,22 +1,25 @@
 "use server";
 
 import Stripe from "stripe";
-
 import { protectedActionClient } from "@/lib/next-safe-action";
 
 export const createStripeCheckout = protectedActionClient.action(
   async ({ ctx }) => {
-    if (!process.env.STRIPE_SECRET_KEY) {
-      throw new Error("Stripe secret key not found");
-    }
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: "2025-05-28.basil",
-    });
-    const { id: sessionId } = await stripe.checkout.sessions.create({
+    const secretKey = process.env.STRIPE_SECRET_KEY;
+    const priceId = process.env.STRIPE_ESSENTIAL_PLAN_PRICE_ID;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+
+    if (!secretKey) throw new Error("Stripe secret key not found");
+    if (!priceId) throw new Error("Missing price ID");
+    if (!appUrl) throw new Error("Missing app URL");
+
+    const stripe = new Stripe(secretKey);
+
+    const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "subscription",
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+      success_url: `${appUrl}/dashboard`,
+      cancel_url: `${appUrl}/dashboard`,
       subscription_data: {
         metadata: {
           userId: ctx.user.id,
@@ -24,13 +27,14 @@ export const createStripeCheckout = protectedActionClient.action(
       },
       line_items: [
         {
-          price: process.env.STRIPE_ESSENTIAL_PLAN_PRICE_ID,
+          price: priceId,
           quantity: 1,
         },
       ],
     });
+
     return {
-      sessionId,
+      sessionId: session.id,
     };
   },
 );
