@@ -12,7 +12,7 @@ const FIVE_MINUTES = 5 * 60;
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
-    usePlural: true,
+    usePlural: false,
     schema,
   }),
   socialProviders: {
