@@ -36,7 +36,7 @@ export function SubscriptionPlan({
       if (!data?.sessionId) {
         throw new Error("Session ID not found");
       }
-      await stripe.redirectToCheckout({
+      ((await stripe) as any).redirectToCheckout({
         sessionId: data.sessionId,
       });
     },
