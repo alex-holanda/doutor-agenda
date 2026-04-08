@@ -1,7 +1,7 @@
 "use server";
 
-import Stripe from "stripe";
 import { protectedActionClient } from "@/lib/next-safe-action";
+import Stripe from "stripe";
 
 export const createStripeCheckout = protectedActionClient.action(
   async ({ ctx }) => {
