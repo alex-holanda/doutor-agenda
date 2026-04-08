@@ -3,14 +3,23 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 export function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Permitir acesso livre à rota de autenticação
+  if (pathname.startsWith("/authentication")) {
+    return NextResponse.next();
+  }
+
   const sessionCookie = getSessionCookie(request);
+
+  // Se não estiver autenticado, redireciona
   if (!sessionCookie) {
     return NextResponse.redirect(new URL("/authentication", request.url));
   }
+
   return NextResponse.next();
 }
 
-// See "Matching Paths" below to learn more
 export const config = {
   matcher: [
     "/dashboard",
@@ -18,6 +27,5 @@ export const config = {
     "/doctors",
     "/appointments",
     "/subscription",
-    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
   ],
 };
