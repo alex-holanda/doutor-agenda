@@ -45,6 +45,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { doctorsTable, patientsTable } from "@/db/schema";
 import { cn } from "@/lib/utils";
 
@@ -63,6 +64,9 @@ const formSchema = z.object({
   }),
   time: z.string().min(1, {
     message: "Horário é obrigatório.",
+  }),
+  chiefComplaint: z.string().min(1, {
+    message: "Queixa principal é obrigatória.",
   }),
 });
 
@@ -88,6 +92,7 @@ const AddAppointmentForm = ({
       appointmentPrice: 0,
       date: undefined,
       time: "",
+      chiefComplaint: "",
     },
   });
 
@@ -128,6 +133,7 @@ const AddAppointmentForm = ({
         appointmentPrice: 0,
         date: undefined,
         time: "",
+        chiefComplaint: "",
       });
     }
   }, [isOpen, form]);
@@ -165,7 +171,7 @@ const AddAppointmentForm = ({
   const isDateTimeEnabled = selectedPatientId && selectedDoctorId;
 
   return (
-    <DialogContent className="sm:max-w-[500px]">
+    <DialogContent className="sm:max-w-125">
       <DialogHeader>
         <DialogTitle>Novo agendamento</DialogTitle>
         <DialogDescription>
@@ -326,6 +332,28 @@ const AddAppointmentForm = ({
                     ))}
                   </SelectContent>
                 </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Queixa principal - Campo obrigatório */}
+          <FormField
+            control={form.control}
+            name="chiefComplaint"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Queixa principal <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Descreva a queixa principal do paciente..."
+                    className="resize-none"
+                    rows={3}
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

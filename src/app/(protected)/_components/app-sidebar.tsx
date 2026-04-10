@@ -2,7 +2,7 @@
 
 import {
   CalendarDays,
-  Gem,
+  ClipboardList,
   LayoutDashboard,
   LogOut,
   Stethoscope,
@@ -43,6 +43,11 @@ const items = [
     title: "Agendamentos",
     url: "/appointments",
     icon: CalendarDays,
+  },
+  {
+    title: "Atendimentos",
+    url: "/attendances",
+    icon: ClipboardList,
   },
   {
     title: "Médicos",

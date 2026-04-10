@@ -1,17 +1,18 @@
+// actions/add-appointment.ts
 "use server";
 
 import dayjs from "dayjs";
 import { revalidatePath } from "next/cache";
 
 import { db } from "@/db";
-import { appointmentsTable } from "@/db/schema";
+import { appointmentsTable, attendancesTable } from "@/db/schema";
 import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 
 import { getAvailableTimes } from "../get-available-times";
 import { addAppointmentSchema } from "./schema";
 
 export const addAppointment = protectedWithClinicActionClient
-  .schema(addAppointmentSchema)
+  .inputSchema(addAppointmentSchema)
   .action(async ({ parsedInput, ctx }) => {
     const availableTimes = await getAvailableTimes({
       doctorId: parsedInput.doctorId,
@@ -31,12 +32,29 @@ export const addAppointment = protectedWithClinicActionClient
       .set("minute", parseInt(parsedInput.time.split(":")[1]))
       .toDate();
 
-    await db.insert(appointmentsTable).values({
-      ...parsedInput,
+    // Inserir o agendamento
+    const [newAppointment] = await db
+      .insert(appointmentsTable)
+      .values({
+        ...parsedInput,
+        clinicId: ctx.user.clinic.id,
+        date: appointmentDateTime,
+      })
+      .returning();
+
+    // Inserir o atendimento vinculado ao agendamento com a queixa
+    await db.insert(attendancesTable).values({
       clinicId: ctx.user.clinic.id,
-      date: appointmentDateTime,
+      patientId: parsedInput.patientId,
+      doctorId: parsedInput.doctorId,
+      appointmentId: newAppointment.id,
+      type: "scheduled",
+      status: "waiting",
+      scheduledStartTime: appointmentDateTime,
+      chiefComplaint: parsedInput.chiefComplaint || null,
     });
 
     revalidatePath("/appointments");
+    revalidatePath("/attendances");
     revalidatePath("/dashboard");
   });
