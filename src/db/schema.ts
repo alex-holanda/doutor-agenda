@@ -109,6 +109,8 @@ export const clinicsTableRelations = relations(clinicsTable, ({ many }) => ({
   patients: many(patientsTable),
   appointments: many(appointmentsTable),
   usersToClinics: many(usersToClinicsTable),
+  questionnaires: many(questionnairesTable),
+  attendances: many(attendancesTable),
 }));
 
 export const doctorsTable = pgTable("doctors", {
@@ -118,7 +120,6 @@ export const doctorsTable = pgTable("doctors", {
     .references(() => clinicsTable.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   avatarImageUrl: text("avatar_image_url"),
-  // 1 - Monday, 2 - Tuesday, 3 - Wednesday, 4 - Thursday, 5 - Friday, 6 - Saturday, 0 - Sunday
   availableFromWeekDay: integer("available_from_week_day").notNull(),
   availableToWeekDay: integer("available_to_week_day").notNull(),
   availableFromTime: time("available_from_time").notNull(),
@@ -139,6 +140,7 @@ export const doctorsTableRelations = relations(
       references: [clinicsTable.id],
     }),
     appointments: many(appointmentsTable),
+    attendances: many(attendancesTable),
   }),
 );
 
@@ -167,6 +169,7 @@ export const patientsTableRelations = relations(
       references: [clinicsTable.id],
     }),
     appointments: many(appointmentsTable),
+    attendances: many(attendancesTable),
   }),
 );
 
@@ -207,7 +210,7 @@ export const appointmentsTableRelations = relations(
   }),
 );
 
-export const ateendanceTypeEnum = pgEnum("attendance_type", [
+export const attendanceTypeEnum = pgEnum("attendance_type", [
   "scheduled",
   "walk_in",
   "emergency",
@@ -235,7 +238,7 @@ export const attendancesTable = pgTable("attendances", {
   doctorId: uuid("doctor_id")
     .notNull()
     .references(() => doctorsTable.id, { onDelete: "cascade" }),
-  type: ateendanceTypeEnum("type").notNull().default("scheduled"),
+  type: attendanceTypeEnum("type").notNull().default("scheduled"),
   status: attendanceStatusEnum("status").notNull().default("waiting"),
   scheduledStartTime: timestamp("scheduled_start_time"),
   actualStartTime: timestamp("actual_start_time"),
@@ -326,7 +329,9 @@ export const vitalSignsTable = pgTable("vital_signs", {
   bloodPressureSystolic: integer("blood_pressure_systolic"),
   bloodPressureDiastolic: integer("blood_pressure_diastolic"),
   heartRate: integer("heart_rate"),
-  respiratoryRate: integer("oxygen_saturation"),
+  respiratoryRate: integer("respiratory_rate"),
+  temperature: integer("temperature"),
+  oxygenSaturation: integer("oxygen_saturation"),
   bloodGlucose: integer("blood_glucose"),
   weight: integer("weight"),
   height: integer("height"),
@@ -338,6 +343,10 @@ export const vitalSignsTable = pgTable("vital_signs", {
     .defaultNow()
     .$onUpdate(() => new Date()),
 });
+
+// =============================================
+// RELAÇÕES CORRIGIDAS
+// =============================================
 
 export const attendancesTableRelations = relations(
   attendancesTable,
@@ -358,7 +367,7 @@ export const attendancesTableRelations = relations(
       fields: [attendancesTable.doctorId],
       references: [doctorsTable.id],
     }),
-    responses: many(questionnaireResponsesTable),
+    questionnaireResponses: many(questionnaireResponsesTable),
     vitalSigns: many(vitalSignsTable),
   }),
 );
@@ -374,9 +383,9 @@ export const questionnairesTableRelations = relations(
 export const questionnaireFieldsTableRelations = relations(
   questionnaireFieldsTable,
   ({ one }) => ({
-    questionnaire: one(questionnaireFieldsTable, {
+    questionnaire: one(questionnairesTable, {
       fields: [questionnaireFieldsTable.questionnaireId],
-      references: [questionnaireFieldsTable.id],
+      references: [questionnairesTable.id],
     }),
   }),
 );
