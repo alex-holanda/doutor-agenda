@@ -23,7 +23,7 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Control } from "react-hook-form";
 
-interface Field {
+interface QuestionnaireField {
   id: string;
   label: string;
   fieldKey: string;
@@ -37,18 +37,23 @@ interface Field {
 }
 
 interface DynamicFieldProps {
-  field: Field;
+  field: QuestionnaireField;
   control: Control<any>;
   disabled?: boolean;
 }
 
 export function DynamicField({ field, control, disabled }: DynamicFieldProps) {
-  const renderField = () => {
+  const renderField = (formField: any) => {
     switch (field.fieldType) {
       case "text":
         return (
           <FormControl>
-            <Input placeholder={field.placeholder || ""} disabled={disabled} />
+            <Input
+              placeholder={field.placeholder || ""}
+              disabled={disabled}
+              value={formField.value || ""}
+              onChange={(e) => formField.onChange(e.target.value)}
+            />
           </FormControl>
         );
 
@@ -59,6 +64,8 @@ export function DynamicField({ field, control, disabled }: DynamicFieldProps) {
               placeholder={field.placeholder || ""}
               rows={4}
               disabled={disabled}
+              value={formField.value || ""}
+              onChange={(e) => formField.onChange(e.target.value)}
             />
           </FormControl>
         );
@@ -72,13 +79,23 @@ export function DynamicField({ field, control, disabled }: DynamicFieldProps) {
               min={field.minValue || undefined}
               max={field.maxValue || undefined}
               disabled={disabled}
+              value={formField.value || ""}
+              onChange={(e) => {
+                const value =
+                  e.target.value === "" ? undefined : Number(e.target.value);
+                formField.onChange(value);
+              }}
             />
           </FormControl>
         );
 
       case "select":
         return (
-          <Select disabled={disabled}>
+          <Select
+            disabled={disabled}
+            value={formField.value || ""}
+            onValueChange={formField.onChange}
+          >
             <FormControl>
               <SelectTrigger>
                 <SelectValue
@@ -99,7 +116,12 @@ export function DynamicField({ field, control, disabled }: DynamicFieldProps) {
       case "radio":
         return (
           <FormControl>
-            <RadioGroup disabled={disabled} className="flex flex-col space-y-2">
+            <RadioGroup
+              disabled={disabled}
+              value={formField.value || ""}
+              onValueChange={formField.onChange}
+              className="flex flex-col space-y-2"
+            >
               {field.options?.map((option) => (
                 <div key={option} className="flex items-center space-x-2">
                   <RadioGroupItem
@@ -115,7 +137,6 @@ export function DynamicField({ field, control, disabled }: DynamicFieldProps) {
           </FormControl>
         );
 
-      case "checkbox":
       case "multi_select":
         return (
           <FormControl>
@@ -125,6 +146,17 @@ export function DynamicField({ field, control, disabled }: DynamicFieldProps) {
                   <Checkbox
                     id={`${field.fieldKey}-${option}`}
                     disabled={disabled}
+                    checked={(formField.value || []).includes(option)}
+                    onCheckedChange={(checked) => {
+                      const currentValue = formField.value || [];
+                      if (checked) {
+                        formField.onChange([...currentValue, option]);
+                      } else {
+                        formField.onChange(
+                          currentValue.filter((v: string) => v !== option),
+                        );
+                      }
+                    }}
                   />
                   <label htmlFor={`${field.fieldKey}-${option}`}>
                     {option}
@@ -139,7 +171,12 @@ export function DynamicField({ field, control, disabled }: DynamicFieldProps) {
         return (
           <FormControl>
             <div className="flex items-center space-x-2">
-              <Switch id={field.fieldKey} disabled={disabled} />
+              <Switch
+                id={field.fieldKey}
+                disabled={disabled}
+                checked={formField.value || false}
+                onCheckedChange={formField.onChange}
+              />
               <label htmlFor={field.fieldKey}>
                 {field.placeholder || "Sim/Não"}
               </label>
@@ -150,14 +187,24 @@ export function DynamicField({ field, control, disabled }: DynamicFieldProps) {
       case "date":
         return (
           <FormControl>
-            <Input type="date" disabled={disabled} />
+            <Input
+              type="date"
+              disabled={disabled}
+              value={formField.value || ""}
+              onChange={(e) => formField.onChange(e.target.value)}
+            />
           </FormControl>
         );
 
       case "time":
         return (
           <FormControl>
-            <Input type="time" disabled={disabled} />
+            <Input
+              type="time"
+              disabled={disabled}
+              value={formField.value || ""}
+              onChange={(e) => formField.onChange(e.target.value)}
+            />
           </FormControl>
         );
 
@@ -171,9 +218,12 @@ export function DynamicField({ field, control, disabled }: DynamicFieldProps) {
                 step={1}
                 disabled={disabled}
                 className="w-full"
+                value={[formField.value || 0]}
+                onValueChange={(value) => formField.onChange(value[0])}
               />
               <div className="text-muted-foreground flex justify-between text-xs">
                 <span>{field.minValue || 0}</span>
+                <span className="font-bold">{formField.value || 0}</span>
                 <span>{field.maxValue || 10}</span>
               </div>
             </div>
@@ -183,7 +233,12 @@ export function DynamicField({ field, control, disabled }: DynamicFieldProps) {
       default:
         return (
           <FormControl>
-            <Input placeholder={field.placeholder || ""} disabled={disabled} />
+            <Input
+              placeholder={field.placeholder || ""}
+              disabled={disabled}
+              value={formField.value || ""}
+              onChange={(e) => formField.onChange(e.target.value)}
+            />
           </FormControl>
         );
     }
@@ -199,7 +254,7 @@ export function DynamicField({ field, control, disabled }: DynamicFieldProps) {
             {field.label}
             {field.isRequired && <span className="ml-1 text-red-500">*</span>}
           </FormLabel>
-          {renderField()}
+          {renderField(formField)}
           {field.helpText && (
             <p className="text-muted-foreground text-xs">{field.helpText}</p>
           )}

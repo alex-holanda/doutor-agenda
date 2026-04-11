@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Save } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -58,28 +58,56 @@ export function QuestionnaireForm({
     queryFn: () => getQuestionnaireWithFields({ questionnaireId }),
   });
 
-  const questionnaire = questionnaireData?.data as Questionnaire | undefined;
+  // Log para depuração
+  console.log("questionnaireData:", questionnaireData);
+  console.log("questionnaireData?.data:", questionnaireData?.data);
+
+  // Tenta acessar os dados de diferentes formas possíveis
+  const questionnaire = (questionnaireData?.data || questionnaireData) as
+    | Questionnaire
+    | undefined;
+  const fields = questionnaire?.fields || [];
+
+  console.log("questionnaire:", questionnaire);
+  console.log("fields:", fields);
 
   const formSchema = z.object(
-    (questionnaire?.fields || []).reduce<Record<string, z.ZodTypeAny>>(
-      (acc, field) => {
-        let validator: z.ZodTypeAny = z.any();
-
-        if (field.isRequired) {
-          if (field.fieldType === "boolean") {
-            validator = z.boolean();
-          } else if (field.fieldType === "number") {
-            validator = z.number().min(1, `${field.label} é obrigatório`);
-          } else {
-            validator = z.string().min(1, `${field.label} é obrigatório`);
-          }
+    fields.reduce<Record<string, z.ZodTypeAny>>((acc, field) => {
+      if (field.isRequired) {
+        if (field.fieldType === "number") {
+          acc[field.fieldKey] = z
+            .number()
+            .min(1, `${field.label} é obrigatório`);
+        } else if (field.fieldType === "boolean") {
+          acc[field.fieldKey] = z.boolean().refine((val) => val === true, {
+            message: `${field.label} é obrigatório`,
+          });
+        } else if (field.fieldType === "scale") {
+          acc[field.fieldKey] = z
+            .number()
+            .min(field.minValue || 0, `${field.label} é obrigatório`);
+        } else if (field.fieldType === "multi_select") {
+          acc[field.fieldKey] = z
+            .array(z.string())
+            .min(1, `${field.label} é obrigatório`);
+        } else {
+          acc[field.fieldKey] = z
+            .string()
+            .min(1, `${field.label} é obrigatório`);
         }
-
-        acc[field.fieldKey] = validator;
-        return acc;
-      },
-      {},
-    ),
+      } else {
+        if (field.fieldType === "number") {
+          acc[field.fieldKey] = z.number().optional();
+        } else if (field.fieldType === "boolean") {
+          acc[field.fieldKey] = z.boolean().optional();
+        } else if (field.fieldType === "multi_select") {
+          acc[field.fieldKey] = z.array(z.string()).optional();
+        } else {
+          acc[field.fieldKey] = z.string().optional();
+        }
+      }
+      return acc;
+    }, {}),
   );
 
   const form = useForm<Record<string, any>>({
@@ -118,10 +146,13 @@ export function QuestionnaireForm({
     );
   }
 
-  if (!questionnaire) {
+  if (!questionnaire || !fields.length) {
     return (
       <div className="text-muted-foreground py-8 text-center">
-        Questionário não encontrado
+        <p>Questionário não encontrado ou sem campos</p>
+        <pre className="mt-2 text-xs">
+          {JSON.stringify(questionnaireData, null, 2)}
+        </pre>
       </div>
     );
   }
@@ -129,7 +160,7 @@ export function QuestionnaireForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {questionnaire.fields.map((field) => (
+        {fields.map((field) => (
           <DynamicField
             key={field.id}
             field={field}
@@ -141,6 +172,7 @@ export function QuestionnaireForm({
         {!isCompleted && (
           <div className="flex justify-end pt-4">
             <Button type="submit" disabled={isSaving}>
+              <Save className="mr-2 h-4 w-4" />
               {isSaving ? "Salvando..." : "Salvar questionário"}
             </Button>
           </div>
