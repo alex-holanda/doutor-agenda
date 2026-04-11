@@ -2,12 +2,11 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -16,10 +15,31 @@ import { saveQuestionnaireResponse } from "@/actions/save-questionnaire-response
 import { getQuestionnaireWithFields } from "@/actions/get-questionnaire-with-fields";
 import { DynamicField } from "./dynamic-field";
 
+interface QuestionnaireField {
+  id: string;
+  label: string;
+  fieldKey: string;
+  fieldType: string;
+  placeholder?: string | null;
+  helpText?: string | null;
+  isRequired?: boolean | null;
+  options?: string[] | null;
+  minValue?: number | null;
+  maxValue?: number | null;
+  order?: number | null;
+}
+
+interface Questionnaire {
+  id: string;
+  name: string;
+  category: string | null;
+  fields: QuestionnaireField[];
+}
+
 interface QuestionnaireFormProps {
   questionnaireId: string;
   attendanceId: string;
-  initialData?: any;
+  initialData?: Record<string, any>;
   isCompleted: boolean;
   onSuccess: () => void;
 }
@@ -31,62 +51,63 @@ export function QuestionnaireForm({
   isCompleted,
   onSuccess,
 }: QuestionnaireFormProps) {
-  // Buscar o questionário com seus campos
+  const [isSaving, setIsSaving] = useState(false);
+
   const { data: questionnaireData, isLoading } = useQuery({
     queryKey: ["questionnaire", questionnaireId],
     queryFn: () => getQuestionnaireWithFields({ questionnaireId }),
   });
 
-  const questionnaire = questionnaireData?.data;
+  const questionnaire = questionnaireData?.data as Questionnaire | undefined;
 
-  // Construir o schema de validação dinamicamente
   const formSchema = z.object(
-    (questionnaire?.fields || []).reduce((acc, field) => {
-      let validator: any = z.any();
+    (questionnaire?.fields || []).reduce<Record<string, z.ZodTypeAny>>(
+      (acc, field) => {
+        let validator: z.ZodTypeAny = z.any();
 
-      if (field.isRequired) {
-        if (field.fieldType === "boolean") {
-          validator = z.boolean();
-        } else if (field.fieldType === "number") {
-          validator = z.number().min(1, `${field.label} é obrigatório`);
-        } else {
-          validator = z.string().min(1, `${field.label} é obrigatório`);
+        if (field.isRequired) {
+          if (field.fieldType === "boolean") {
+            validator = z.boolean();
+          } else if (field.fieldType === "number") {
+            validator = z.number().min(1, `${field.label} é obrigatório`);
+          } else {
+            validator = z.string().min(1, `${field.label} é obrigatório`);
+          }
         }
-      }
 
-      return { ...acc, [field.fieldKey]: validator };
-    }, {}),
+        acc[field.fieldKey] = validator;
+        return acc;
+      },
+      {},
+    ),
   );
 
-  const form = useForm({
+  const form = useForm<Record<string, any>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {},
   });
 
-  // Resetar o formulário quando os dados iniciais mudarem
   useEffect(() => {
     if (initialData) {
       form.reset(initialData);
     }
   }, [initialData, form]);
 
-  const { execute, isPending } = useAction(saveQuestionnaireResponse, {
-    onSuccess: () => {
+  const onSubmit = async (data: Record<string, any>) => {
+    setIsSaving(true);
+    try {
+      await saveQuestionnaireResponse({
+        attendanceId,
+        questionnaireId,
+        responseData: data,
+      });
       toast.success("Questionário salvo com sucesso");
       onSuccess();
-    },
-    onError: (error) => {
-      console.error(error);
+    } catch (error) {
       toast.error("Erro ao salvar questionário");
-    },
-  });
-
-  const onSubmit = (data: any) => {
-    execute({
-      attendanceId,
-      questionnaireId,
-      responseData: data,
-    });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (isLoading) {
@@ -119,8 +140,8 @@ export function QuestionnaireForm({
 
         {!isCompleted && (
           <div className="flex justify-end pt-4">
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Salvando..." : "Salvar questionário"}
+            <Button type="submit" disabled={isSaving}>
+              {isSaving ? "Salvando..." : "Salvar questionário"}
             </Button>
           </div>
         )}

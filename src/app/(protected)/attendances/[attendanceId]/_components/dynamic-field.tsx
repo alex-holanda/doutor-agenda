@@ -1,4 +1,4 @@
-// app/attendances/[attendanceId]/components/dynamic-field.tsx
+// app/attendances/[attendanceId]/_components/dynamic-field.tsx
 "use client";
 
 import {
@@ -23,19 +23,21 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Control } from "react-hook-form";
 
+interface Field {
+  id: string;
+  label: string;
+  fieldKey: string;
+  fieldType: string;
+  placeholder?: string | null;
+  helpText?: string | null;
+  isRequired?: boolean | null;
+  options?: string[] | null;
+  minValue?: number | null;
+  maxValue?: number | null;
+}
+
 interface DynamicFieldProps {
-  field: {
-    id: string;
-    label: string;
-    fieldKey: string;
-    fieldType: string;
-    placeholder?: string | null;
-    helpText?: string | null;
-    isRequired: boolean;
-    options?: string[] | null;
-    minValue?: number | null;
-    maxValue?: number | null;
-  };
+  field: Field;
   control: Control<any>;
   disabled?: boolean;
 }
@@ -114,24 +116,6 @@ export function DynamicField({ field, control, disabled }: DynamicFieldProps) {
         );
 
       case "checkbox":
-        return (
-          <FormControl>
-            <div className="flex flex-col space-y-2">
-              {field.options?.map((option) => (
-                <div key={option} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`${field.fieldKey}-${option}`}
-                    disabled={disabled}
-                  />
-                  <label htmlFor={`${field.fieldKey}-${option}`}>
-                    {option}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </FormControl>
-        );
-
       case "multi_select":
         return (
           <FormControl>

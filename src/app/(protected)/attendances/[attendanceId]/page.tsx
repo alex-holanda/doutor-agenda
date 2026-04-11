@@ -15,13 +15,13 @@ import {
   PageTitle,
 } from "@/components/ui/page-container";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { db } from "@/db";
 import { attendancesTable } from "@/db/schema";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { QuestionnairesSection } from "./_components/questionnaires-section";
+import { StartAttendanceButton } from "./_components/start-attendance-button";
 import { CompleteAttendanceButton } from "./_components/complete-attendance-button";
 
 interface AttendancePageProps {
@@ -84,6 +84,9 @@ export default async function AttendancePage({ params }: AttendancePageProps) {
 
   const type = typeConfig[attendance.type as keyof typeof typeConfig];
   const isCompleted = attendance.status === "completed";
+  const isInProgress = attendance.status === "in_progress";
+  const isWaiting = attendance.status === "waiting";
+  const showQuestionnaires = isInProgress || isCompleted;
 
   return (
     <WithAuthentication mustHaveClinic mustHavePlan>
@@ -95,6 +98,11 @@ export default async function AttendancePage({ params }: AttendancePageProps) {
           </PageHeaderContent>
           <PageActions>
             <Badge variant={type.variant}>{type.label}</Badge>
+            <Badge variant="outline">
+              {isWaiting && "Aguardando"}
+              {isInProgress && "Em andamento"}
+              {isCompleted && "Concluído"}
+            </Badge>
           </PageActions>
         </PageHeader>
         <PageContent>
@@ -223,17 +231,21 @@ export default async function AttendancePage({ params }: AttendancePageProps) {
               </CardContent>
             </Card>
 
-            <QuestionnairesSection
-              attendanceId={attendance.id}
-              isCompleted={isCompleted}
-            />
-
-            {/* Botão de finalizar atendimento */}
-            {!isCompleted && (
-              <div className="flex justify-end">
-                <CompleteAttendanceButton attendanceId={attendance.id} />
-              </div>
+            {showQuestionnaires && (
+              <QuestionnairesSection
+                attendanceId={attendance.id}
+                isCompleted={isCompleted}
+              />
             )}
+
+            <div className="flex justify-end gap-4">
+              {isWaiting && (
+                <StartAttendanceButton attendanceId={attendance.id} />
+              )}
+              {isInProgress && (
+                <CompleteAttendanceButton attendanceId={attendance.id} />
+              )}
+            </div>
           </div>
         </PageContent>
       </PageContainer>
