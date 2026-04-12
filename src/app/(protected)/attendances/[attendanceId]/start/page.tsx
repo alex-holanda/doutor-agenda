@@ -1,4 +1,4 @@
-// src/app/(protected)/attendances/[attendanceId]/page.tsx
+// app/(protected)/attendances/[attendanceId]/start/page.tsx
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
@@ -13,18 +13,20 @@ import {
   PageTitle,
   PageDescription,
 } from "@/components/ui/page-container";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { db } from "@/db";
 import { attendancesTable } from "@/db/schema";
-import { AttendanceFlow } from "./_components/attendance-flow";
+import { StartAttendanceForm } from "./_components/start-attendance-form";
 
-interface AttendancePageProps {
+interface StartAttendancePageProps {
   params: Promise<{
     attendanceId: string;
   }>;
 }
 
-export default async function AttendancePage({ params }: AttendancePageProps) {
+export default async function StartAttendancePage({
+  params,
+}: StartAttendancePageProps) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -41,9 +43,8 @@ export default async function AttendancePage({ params }: AttendancePageProps) {
       eq(attendancesTable.clinicId, session.user.clinic?.id!),
     ),
     with: {
-      doctor: true,
       patient: true,
-      appointment: true,
+      doctor: true,
     },
   });
 
@@ -51,17 +52,8 @@ export default async function AttendancePage({ params }: AttendancePageProps) {
     notFound();
   }
 
-  const typeConfig = {
-    scheduled: { label: "Agendado", variant: "default" as const },
-    walk_in: { label: "Avulso", variant: "outline" as const },
-    emergency: { label: "Emergência", variant: "destructive" as const },
-  };
-
-  const type = typeConfig[attendance.type as keyof typeof typeConfig];
-  const isCompleted = attendance.status === "completed";
-
-  if (isCompleted) {
-    redirect(`/attendances/${attendanceId}/report`);
+  if (attendance.status !== "waiting") {
+    redirect(`/attendances/${attendanceId}`);
   }
 
   return (
@@ -69,25 +61,17 @@ export default async function AttendancePage({ params }: AttendancePageProps) {
       <PageContainer>
         <PageHeader>
           <PageHeaderContent>
-            <PageTitle>Atendimento Médico</PageTitle>
+            <PageTitle>Iniciar Atendimento</PageTitle>
             <PageDescription>
-              {attendance.patient.name} - {attendance.doctor.specialty}
+              Confirme os dados e inicie o atendimento
             </PageDescription>
           </PageHeaderContent>
-          <div className="flex gap-2">
-            <Badge variant={type.variant}>{type.label}</Badge>
-            <Badge variant="outline">
-              {attendance.status === "waiting" && "Aguardando"}
-              {attendance.status === "in_progress" && "Em andamento"}
-            </Badge>
-          </div>
         </PageHeader>
         <PageContent>
-          <AttendanceFlow
+          <StartAttendanceForm
             attendanceId={attendance.id}
             patientName={attendance.patient.name}
-            doctorId={attendance.doctor.id}
-            initialStatus={attendance.status}
+            doctorName={attendance.doctor.name}
             chiefComplaint={attendance.chiefComplaint}
           />
         </PageContent>

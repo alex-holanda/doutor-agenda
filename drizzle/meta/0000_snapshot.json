@@ -1,5 +1,5 @@
 {
-  "id": "48e40265-5859-4d3e-8781-686ebbd8e832",
+  "id": "5436149b-fbb4-4cb6-8df5-4d9524da2db6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -87,7 +87,53 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_accounts_user_id": {
+          "name": "idx_accounts_user_id",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_accounts_provider_id": {
+          "name": "idx_accounts_provider_id",
+          "columns": [
+            {
+              "expression": "provider_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_accounts_account_id": {
+          "name": "idx_accounts_account_id",
+          "columns": [
+            {
+              "expression": "account_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "accounts_user_id_users_id_fk": {
           "name": "accounts_user_id_users_id_fk",
@@ -150,6 +196,19 @@
           "primaryKey": false,
           "notNull": true
         },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'scheduled'"
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -165,7 +224,125 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_appointments_date": {
+          "name": "idx_appointments_date",
+          "columns": [
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_appointments_clinic_id": {
+          "name": "idx_appointments_clinic_id",
+          "columns": [
+            {
+              "expression": "clinic_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_appointments_patient_id": {
+          "name": "idx_appointments_patient_id",
+          "columns": [
+            {
+              "expression": "patient_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_appointments_doctor_id": {
+          "name": "idx_appointments_doctor_id",
+          "columns": [
+            {
+              "expression": "doctor_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_appointments_status": {
+          "name": "idx_appointments_status",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_appointments_doctor_date": {
+          "name": "idx_appointments_doctor_date",
+          "columns": [
+            {
+              "expression": "doctor_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_appointments_patient_date": {
+          "name": "idx_appointments_patient_date",
+          "columns": [
+            {
+              "expression": "patient_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "appointments_clinic_id_clinics_id_fk": {
           "name": "appointments_clinic_id_clinics_id_fk",
@@ -309,7 +486,155 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_attendances_clinic_id": {
+          "name": "idx_attendances_clinic_id",
+          "columns": [
+            {
+              "expression": "clinic_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_attendances_patient_id": {
+          "name": "idx_attendances_patient_id",
+          "columns": [
+            {
+              "expression": "patient_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_attendances_doctor_id": {
+          "name": "idx_attendances_doctor_id",
+          "columns": [
+            {
+              "expression": "doctor_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_attendances_appointment_id": {
+          "name": "idx_attendances_appointment_id",
+          "columns": [
+            {
+              "expression": "appointment_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_attendances_status": {
+          "name": "idx_attendances_status",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_attendances_type": {
+          "name": "idx_attendances_type",
+          "columns": [
+            {
+              "expression": "type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_attendances_actual_start_time": {
+          "name": "idx_attendances_actual_start_time",
+          "columns": [
+            {
+              "expression": "actual_start_time",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_attendances_doctor_status": {
+          "name": "idx_attendances_doctor_status",
+          "columns": [
+            {
+              "expression": "doctor_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_attendances_patient_status": {
+          "name": "idx_attendances_patient_status",
+          "columns": [
+            {
+              "expression": "patient_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "attendances_clinic_id_clinics_id_fk": {
           "name": "attendances_clinic_id_clinics_id_fk",
@@ -334,7 +659,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "set null",
           "onUpdate": "no action"
         },
         "attendances_patient_id_patients_id_fk": {
@@ -387,6 +712,30 @@
           "primaryKey": false,
           "notNull": true
         },
+        "cnpj": {
+          "name": "cnpj",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -402,8 +751,200 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_clinics_name": {
+          "name": "idx_clinics_name",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_clinics_cnpj": {
+          "name": "idx_clinics_cnpj",
+          "columns": [
+            {
+              "expression": "cnpj",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_clinics_email": {
+          "name": "idx_clinics_email",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "clinics_cnpj_unique": {
+          "name": "clinics_cnpj_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "cnpj"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.doctor_questionnaires": {
+      "name": "doctor_questionnaires",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "doctor_id": {
+          "name": "doctor_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "template_id": {
+          "name": "template_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "customizations": {
+          "name": "customizations",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_doctor_questionnaires_doctor_id": {
+          "name": "idx_doctor_questionnaires_doctor_id",
+          "columns": [
+            {
+              "expression": "doctor_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_doctor_questionnaires_template_id": {
+          "name": "idx_doctor_questionnaires_template_id",
+          "columns": [
+            {
+              "expression": "template_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_doctor_questionnaires_is_active": {
+          "name": "idx_doctor_questionnaires_is_active",
+          "columns": [
+            {
+              "expression": "is_active",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "doctor_questionnaires_doctor_id_doctors_id_fk": {
+          "name": "doctor_questionnaires_doctor_id_doctors_id_fk",
+          "tableFrom": "doctor_questionnaires",
+          "tableTo": "doctors",
+          "columnsFrom": [
+            "doctor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "doctor_questionnaires_template_id_questionnaire_templates_id_fk": {
+          "name": "doctor_questionnaires_template_id_questionnaire_templates_id_fk",
+          "tableFrom": "doctor_questionnaires",
+          "tableTo": "questionnaire_templates",
+          "columnsFrom": [
+            "template_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -427,17 +968,47 @@
           "primaryKey": false,
           "notNull": true
         },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "name": {
           "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
+        "crm": {
+          "name": "crm",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "avatar_image_url": {
           "name": "avatar_image_url",
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "specialty": {
+          "name": "specialty",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         },
         "available_from_week_day": {
           "name": "available_from_week_day",
@@ -463,17 +1034,18 @@
           "primaryKey": false,
           "notNull": true
         },
-        "specialty": {
-          "name": "specialty",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
         "appointment_price_in_cents": {
           "name": "appointment_price_in_cents",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
         },
         "created_at": {
           "name": "created_at",
@@ -490,7 +1062,98 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_doctors_clinic_id": {
+          "name": "idx_doctors_clinic_id",
+          "columns": [
+            {
+              "expression": "clinic_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_doctors_user_id": {
+          "name": "idx_doctors_user_id",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_doctors_specialty": {
+          "name": "idx_doctors_specialty",
+          "columns": [
+            {
+              "expression": "specialty",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_doctors_crm": {
+          "name": "idx_doctors_crm",
+          "columns": [
+            {
+              "expression": "crm",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_doctors_email": {
+          "name": "idx_doctors_email",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_doctors_is_active": {
+          "name": "idx_doctors_is_active",
+          "columns": [
+            {
+              "expression": "is_active",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "doctors_clinic_id_clinics_id_fk": {
           "name": "doctors_clinic_id_clinics_id_fk",
@@ -498,6 +1161,164 @@
           "tableTo": "clinics",
           "columnsFrom": [
             "clinic_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "doctors_user_id_users_id_fk": {
+          "name": "doctors_user_id_users_id_fk",
+          "tableFrom": "doctors",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.medical_certificates": {
+      "name": "medical_certificates",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "attendance_id": {
+          "name": "attendance_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "days": {
+          "name": "days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cid_code": {
+          "name": "cid_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cid_description": {
+          "name": "cid_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "recommendation": {
+          "name": "recommendation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "issued_at": {
+          "name": "issued_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_medical_certificates_attendance_id": {
+          "name": "idx_medical_certificates_attendance_id",
+          "columns": [
+            {
+              "expression": "attendance_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_medical_certificates_cid_code": {
+          "name": "idx_medical_certificates_cid_code",
+          "columns": [
+            {
+              "expression": "cid_code",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_medical_certificates_issued_at": {
+          "name": "idx_medical_certificates_issued_at",
+          "columns": [
+            {
+              "expression": "issued_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "medical_certificates_attendance_id_attendances_id_fk": {
+          "name": "medical_certificates_attendance_id_attendances_id_fk",
+          "tableFrom": "medical_certificates",
+          "tableTo": "attendances",
+          "columnsFrom": [
+            "attendance_id"
           ],
           "columnsTo": [
             "id"
@@ -535,6 +1356,18 @@
           "primaryKey": false,
           "notNull": true
         },
+        "cpf": {
+          "name": "cpf",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rg": {
+          "name": "rg",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "email": {
           "name": "email",
           "type": "text",
@@ -547,12 +1380,11 @@
           "primaryKey": false,
           "notNull": true
         },
-        "created_at": {
-          "name": "created_at",
+        "birth_date": {
+          "name": "birth_date",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": false
         },
         "sex": {
           "name": "sex",
@@ -560,6 +1392,56 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "insurance": {
+          "name": "insurance",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "insurance_number": {
+          "name": "insurance_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "emergency_contact": {
+          "name": "emergency_contact",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "emergency_phone": {
+          "name": "emergency_phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
@@ -569,7 +1451,128 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_patients_clinic_id": {
+          "name": "idx_patients_clinic_id",
+          "columns": [
+            {
+              "expression": "clinic_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_patients_name": {
+          "name": "idx_patients_name",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_patients_cpf": {
+          "name": "idx_patients_cpf",
+          "columns": [
+            {
+              "expression": "cpf",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_patients_email": {
+          "name": "idx_patients_email",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_patients_phone_number": {
+          "name": "idx_patients_phone_number",
+          "columns": [
+            {
+              "expression": "phone_number",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_patients_birth_date": {
+          "name": "idx_patients_birth_date",
+          "columns": [
+            {
+              "expression": "birth_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_patients_insurance": {
+          "name": "idx_patients_insurance",
+          "columns": [
+            {
+              "expression": "insurance",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_patients_is_active": {
+          "name": "idx_patients_is_active",
+          "columns": [
+            {
+              "expression": "is_active",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "patients_clinic_id_clinics_id_fk": {
           "name": "patients_clinic_id_clinics_id_fk",
@@ -586,13 +1589,21 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "patients_cpf_unique": {
+          "name": "patients_cpf_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "cpf"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.questionnaire_fields": {
-      "name": "questionnaire_fields",
+    "public.physical_exams": {
+      "name": "physical_exams",
       "schema": "",
       "columns": {
         "id": {
@@ -602,14 +1613,320 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "questionnaire_id": {
-          "name": "questionnaire_id",
+        "attendance_id": {
+          "name": "attendance_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "label": {
-          "name": "label",
+        "general_state": {
+          "name": "general_state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "consciousness_level": {
+          "name": "consciousness_level",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hydration": {
+          "name": "hydration",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "skin_color": {
+          "name": "skin_color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lung_auscultation": {
+          "name": "lung_auscultation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "heart_auscultation": {
+          "name": "heart_auscultation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "abdomen": {
+          "name": "abdomen",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "extremities": {
+          "name": "extremities",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "neurological": {
+          "name": "neurological",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "observations": {
+          "name": "observations",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "examined_at": {
+          "name": "examined_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "examined_by": {
+          "name": "examined_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_physical_exams_attendance_id": {
+          "name": "idx_physical_exams_attendance_id",
+          "columns": [
+            {
+              "expression": "attendance_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_physical_exams_examined_at": {
+          "name": "idx_physical_exams_examined_at",
+          "columns": [
+            {
+              "expression": "examined_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_physical_exams_examined_by": {
+          "name": "idx_physical_exams_examined_by",
+          "columns": [
+            {
+              "expression": "examined_by",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "physical_exams_attendance_id_attendances_id_fk": {
+          "name": "physical_exams_attendance_id_attendances_id_fk",
+          "tableFrom": "physical_exams",
+          "tableTo": "attendances",
+          "columnsFrom": [
+            "attendance_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.prescriptions": {
+      "name": "prescriptions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "attendance_id": {
+          "name": "attendance_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "prescription_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'finalized'"
+        },
+        "medications": {
+          "name": "medications",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "exams": {
+          "name": "exams",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "orientations": {
+          "name": "orientations",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "return_date": {
+          "name": "return_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "signed_at": {
+          "name": "signed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_prescriptions_attendance_id": {
+          "name": "idx_prescriptions_attendance_id",
+          "columns": [
+            {
+              "expression": "attendance_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_prescriptions_status": {
+          "name": "idx_prescriptions_status",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_prescriptions_return_date": {
+          "name": "idx_prescriptions_return_date",
+          "columns": [
+            {
+              "expression": "return_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "prescriptions_attendance_id_attendances_id_fk": {
+          "name": "prescriptions_attendance_id_attendances_id_fk",
+          "tableFrom": "prescriptions",
+          "tableTo": "attendances",
+          "columnsFrom": [
+            "attendance_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.question_fields_catalog": {
+      "name": "question_fields_catalog",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -626,6 +1943,42 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "unit": {
+          "name": "unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "min_value": {
+          "name": "min_value",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "max_value": {
+          "name": "max_value",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "options": {
+          "name": "options",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
         },
         "placeholder": {
           "name": "placeholder",
@@ -646,29 +1999,19 @@
           "notNull": false,
           "default": false
         },
-        "options": {
-          "name": "options",
-          "type": "text[]",
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": true
         },
-        "min_value": {
-          "name": "min_value",
-          "type": "integer",
+        "is_system": {
+          "name": "is_system",
+          "type": "boolean",
           "primaryKey": false,
-          "notNull": false
-        },
-        "max_value": {
-          "name": "max_value",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "regex_pattern": {
-          "name": "regex_pattern",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": false
         },
         "order": {
           "name": "order",
@@ -692,24 +2035,79 @@
           "default": "now()"
         }
       },
-      "indexes": {},
-      "foreignKeys": {
-        "questionnaire_fields_questionnaire_id_questionnaires_id_fk": {
-          "name": "questionnaire_fields_questionnaire_id_questionnaires_id_fk",
-          "tableFrom": "questionnaire_fields",
-          "tableTo": "questionnaires",
-          "columnsFrom": [
-            "questionnaire_id"
+      "indexes": {
+        "idx_question_fields_category": {
+          "name": "idx_question_fields_category",
+          "columns": [
+            {
+              "expression": "category",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "columnsTo": [
-            "id"
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_question_fields_field_type": {
+          "name": "idx_question_fields_field_type",
+          "columns": [
+            {
+              "expression": "field_type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_question_fields_is_active": {
+          "name": "idx_question_fields_is_active",
+          "columns": [
+            {
+              "expression": "is_active",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_question_fields_field_key": {
+          "name": "idx_question_fields_field_key",
+          "columns": [
+            {
+              "expression": "field_key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "question_fields_catalog_field_key_unique": {
+          "name": "question_fields_catalog_field_key_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "field_key"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -731,8 +2129,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "questionnaire_id": {
-          "name": "questionnaire_id",
+        "doctor_questionnaire_id": {
+          "name": "doctor_questionnaire_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -745,7 +2143,7 @@
         },
         "answered_by_id": {
           "name": "answered_by_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
@@ -776,7 +2174,68 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_questionnaire_responses_attendance_id": {
+          "name": "idx_questionnaire_responses_attendance_id",
+          "columns": [
+            {
+              "expression": "attendance_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_questionnaire_responses_doctor_questionnaire_id": {
+          "name": "idx_questionnaire_responses_doctor_questionnaire_id",
+          "columns": [
+            {
+              "expression": "doctor_questionnaire_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_questionnaire_responses_answered_by": {
+          "name": "idx_questionnaire_responses_answered_by",
+          "columns": [
+            {
+              "expression": "answered_by",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_questionnaire_responses_completed_at": {
+          "name": "idx_questionnaire_responses_completed_at",
+          "columns": [
+            {
+              "expression": "completed_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "questionnaire_responses_attendance_id_attendances_id_fk": {
           "name": "questionnaire_responses_attendance_id_attendances_id_fk",
@@ -791,12 +2250,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "questionnaire_responses_questionnaire_id_questionnaires_id_fk": {
-          "name": "questionnaire_responses_questionnaire_id_questionnaires_id_fk",
+        "questionnaire_responses_doctor_questionnaire_id_doctor_questionnaires_id_fk": {
+          "name": "questionnaire_responses_doctor_questionnaire_id_doctor_questionnaires_id_fk",
           "tableFrom": "questionnaire_responses",
-          "tableTo": "questionnaires",
+          "tableTo": "doctor_questionnaires",
           "columnsFrom": [
-            "questionnaire_id"
+            "doctor_questionnaire_id"
           ],
           "columnsTo": [
             "id"
@@ -811,8 +2270,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.questionnaires": {
-      "name": "questionnaires",
+    "public.questionnaire_template_fields": {
+      "name": "questionnaire_template_fields",
       "schema": "",
       "columns": {
         "id": {
@@ -822,30 +2281,37 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "clinic_id": {
-          "name": "clinic_id",
+        "template_id": {
+          "name": "template_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "name": {
-          "name": "name",
-          "type": "text",
+        "field_id": {
+          "name": "field_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "category": {
-          "name": "category",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "is_active": {
-          "name": "is_active",
+        "is_required": {
+          "name": "is_required",
           "type": "boolean",
           "primaryKey": false,
           "notNull": false,
-          "default": true
+          "default": false
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "custom_label": {
+          "name": "custom_label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -862,14 +2328,267 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_template_fields_template_id": {
+          "name": "idx_template_fields_template_id",
+          "columns": [
+            {
+              "expression": "template_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_template_fields_field_id": {
+          "name": "idx_template_fields_field_id",
+          "columns": [
+            {
+              "expression": "field_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "questionnaires_clinic_id_clinics_id_fk": {
-          "name": "questionnaires_clinic_id_clinics_id_fk",
-          "tableFrom": "questionnaires",
+        "questionnaire_template_fields_template_id_questionnaire_templates_id_fk": {
+          "name": "questionnaire_template_fields_template_id_questionnaire_templates_id_fk",
+          "tableFrom": "questionnaire_template_fields",
+          "tableTo": "questionnaire_templates",
+          "columnsFrom": [
+            "template_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "questionnaire_template_fields_field_id_question_fields_catalog_id_fk": {
+          "name": "questionnaire_template_fields_field_id_question_fields_catalog_id_fk",
+          "tableFrom": "questionnaire_template_fields",
+          "tableTo": "question_fields_catalog",
+          "columnsFrom": [
+            "field_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.questionnaire_templates": {
+      "name": "questionnaire_templates",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category_type": {
+          "name": "category_type",
+          "type": "questionnaire_category",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'system'"
+        },
+        "clinic_id": {
+          "name": "clinic_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "doctor_id": {
+          "name": "doctor_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "is_system": {
+          "name": "is_system",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "usage_count": {
+          "name": "usage_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "parent_template_id": {
+          "name": "parent_template_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_questionnaire_templates_category": {
+          "name": "idx_questionnaire_templates_category",
+          "columns": [
+            {
+              "expression": "category",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_questionnaire_templates_category_type": {
+          "name": "idx_questionnaire_templates_category_type",
+          "columns": [
+            {
+              "expression": "category_type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_questionnaire_templates_clinic_id": {
+          "name": "idx_questionnaire_templates_clinic_id",
+          "columns": [
+            {
+              "expression": "clinic_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_questionnaire_templates_doctor_id": {
+          "name": "idx_questionnaire_templates_doctor_id",
+          "columns": [
+            {
+              "expression": "doctor_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_questionnaire_templates_is_active": {
+          "name": "idx_questionnaire_templates_is_active",
+          "columns": [
+            {
+              "expression": "is_active",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "questionnaire_templates_clinic_id_clinics_id_fk": {
+          "name": "questionnaire_templates_clinic_id_clinics_id_fk",
+          "tableFrom": "questionnaire_templates",
           "tableTo": "clinics",
           "columnsFrom": [
             "clinic_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "questionnaire_templates_doctor_id_doctors_id_fk": {
+          "name": "questionnaire_templates_doctor_id_doctors_id_fk",
+          "tableFrom": "questionnaire_templates",
+          "tableTo": "doctors",
+          "columnsFrom": [
+            "doctor_id"
           ],
           "columnsTo": [
             "id"
@@ -937,7 +2656,53 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_sessions_user_id": {
+          "name": "idx_sessions_user_id",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_sessions_token": {
+          "name": "idx_sessions_token",
+          "columns": [
+            {
+              "expression": "token",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_sessions_expires_at": {
+          "name": "idx_sessions_expires_at",
+          "columns": [
+            {
+              "expression": "expires_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "sessions_user_id_users_id_fk": {
           "name": "sessions_user_id_users_id_fk",
@@ -1032,7 +2797,68 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_users_email": {
+          "name": "idx_users_email",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_users_stripe_customer_id": {
+          "name": "idx_users_stripe_customer_id",
+          "columns": [
+            {
+              "expression": "stripe_customer_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_users_plan": {
+          "name": "idx_users_plan",
+          "columns": [
+            {
+              "expression": "plan",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_users_created_at": {
+          "name": "idx_users_created_at",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
@@ -1064,6 +2890,13 @@
           "primaryKey": false,
           "notNull": true
         },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'member'"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -1079,7 +2912,74 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_users_to_clinics_user_id": {
+          "name": "idx_users_to_clinics_user_id",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_users_to_clinics_clinic_id": {
+          "name": "idx_users_to_clinics_clinic_id",
+          "columns": [
+            {
+              "expression": "clinic_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_users_to_clinics_unique": {
+          "name": "idx_users_to_clinics_unique",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "clinic_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_users_to_clinics_role": {
+          "name": "idx_users_to_clinics_role",
+          "columns": [
+            {
+              "expression": "role",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "users_to_clinics_user_id_users_id_fk": {
           "name": "users_to_clinics_user_id_users_id_fk",
@@ -1155,7 +3055,38 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_verifications_identifier": {
+          "name": "idx_verifications_identifier",
+          "columns": [
+            {
+              "expression": "identifier",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_verifications_expires_at": {
+          "name": "idx_verifications_expires_at",
+          "columns": [
+            {
+              "expression": "expires_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
@@ -1184,7 +3115,8 @@
           "name": "measured_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "measured_by": {
           "name": "measured_by",
@@ -1210,6 +3142,18 @@
           "primaryKey": false,
           "notNull": false
         },
+        "respiratory_rate": {
+          "name": "respiratory_rate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "temperature": {
+          "name": "temperature",
+          "type": "numeric(4, 1)",
+          "primaryKey": false,
+          "notNull": false
+        },
         "oxygen_saturation": {
           "name": "oxygen_saturation",
           "type": "integer",
@@ -1224,19 +3168,19 @@
         },
         "weight": {
           "name": "weight",
-          "type": "integer",
+          "type": "numeric(5, 2)",
           "primaryKey": false,
           "notNull": false
         },
         "height": {
           "name": "height",
-          "type": "integer",
+          "type": "numeric(5, 2)",
           "primaryKey": false,
           "notNull": false
         },
         "bmi": {
           "name": "bmi",
-          "type": "integer",
+          "type": "numeric(4, 1)",
           "primaryKey": false,
           "notNull": false
         },
@@ -1267,7 +3211,53 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_vital_signs_attendance_id": {
+          "name": "idx_vital_signs_attendance_id",
+          "columns": [
+            {
+              "expression": "attendance_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_vital_signs_measured_at": {
+          "name": "idx_vital_signs_measured_at",
+          "columns": [
+            {
+              "expression": "measured_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_vital_signs_measured_by": {
+          "name": "idx_vital_signs_measured_by",
+          "columns": [
+            {
+              "expression": "measured_by",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "vital_signs_attendance_id_attendances_id_fk": {
           "name": "vital_signs_attendance_id_attendances_id_fk",
@@ -1291,15 +3281,6 @@
     }
   },
   "enums": {
-    "public.attendance_type": {
-      "name": "attendance_type",
-      "schema": "public",
-      "values": [
-        "scheduled",
-        "walk_in",
-        "emergency"
-      ]
-    },
     "public.attendance_status": {
       "name": "attendance_status",
       "schema": "public",
@@ -1309,6 +3290,15 @@
         "completed",
         "cancelled",
         "no_show"
+      ]
+    },
+    "public.attendance_type": {
+      "name": "attendance_type",
+      "schema": "public",
+      "values": [
+        "scheduled",
+        "walk_in",
+        "emergency"
       ]
     },
     "public.field_type": {
@@ -1334,6 +3324,25 @@
       "values": [
         "male",
         "female"
+      ]
+    },
+    "public.prescription_status": {
+      "name": "prescription_status",
+      "schema": "public",
+      "values": [
+        "draft",
+        "finalized",
+        "dispensed",
+        "cancelled"
+      ]
+    },
+    "public.questionnaire_category": {
+      "name": "questionnaire_category",
+      "schema": "public",
+      "values": [
+        "system",
+        "clinic",
+        "personal"
       ]
     }
   },
