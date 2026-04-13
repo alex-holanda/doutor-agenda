@@ -31,8 +31,11 @@ export default async function StartAttendancePage({
     headers: await headers(),
   });
 
-  if (!session) {
-    redirect("/login");
+  if (!session?.user) {
+    redirect("/authentication");
+  }
+  if (!session?.user?.clinic) {
+    redirect("/clinic-form");
   }
 
   const { attendanceId } = await params;

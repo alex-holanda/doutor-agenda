@@ -71,14 +71,18 @@ export default async function AttendancePage({ params }: AttendancePageProps) {
       <PageContainer>
         <PageHeader>
           <PageHeaderContent>
-            <PageTitle>Atendimento Médico</PageTitle>
-            <PageDescription>
+            <PageTitle className="text-lg md:text-xl">
+              Atendimento Médico
+            </PageTitle>
+            <PageDescription className="text-xs md:text-sm">
               {attendance.patient.name} - {attendance.doctor.specialty}
             </PageDescription>
           </PageHeaderContent>
-          <div className="flex gap-2">
-            <Badge variant={type.variant}>{type.label}</Badge>
-            <Badge variant="outline">
+          <div className="flex flex-wrap gap-2">
+            <Badge variant={type.variant} className="text-xs">
+              {type.label}
+            </Badge>
+            <Badge variant="outline" className="text-xs">
               {attendance.status === "waiting" && "Aguardando"}
               {attendance.status === "in_progress" && "Em andamento"}
             </Badge>

@@ -24,31 +24,45 @@ export function FlowNavigation({
   isSaving,
 }: FlowNavigationProps) {
   return (
-    <div className="flex justify-between pt-6">
+    <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-between md:pt-6">
       <Button
         type="button"
         variant="outline"
         onClick={onPrevious}
         disabled={currentStep === 0 || isSaving}
+        className="w-full sm:w-auto"
       >
-        <ChevronLeft className="mr-2 h-4 w-4" />
-        Voltar
+        <ChevronLeft className="mr-1 h-4 w-4 sm:mr-2" />
+        <span className="hidden sm:inline">Voltar</span>
       </Button>
 
       {!isLastStep ? (
-        <Button type="button" onClick={onNext} disabled={isSaving}>
-          {isSaving ? "Salvando..." : "Próximo"}
-          <ChevronRight className="ml-2 h-4 w-4" />
+        <Button
+          type="button"
+          onClick={onNext}
+          disabled={isSaving}
+          className="w-full sm:w-auto"
+        >
+          <span className="hidden sm:inline">
+            {isSaving ? "Salvando..." : "Próximo"}
+          </span>
+          <span className="sm:hidden">{isSaving ? "Salvando" : "Próximo"}</span>
+          <ChevronRight className="ml-1 h-4 w-4 sm:ml-2" />
         </Button>
       ) : (
         <Button
           type="button"
           onClick={onComplete}
           disabled={isSaving}
-          className="bg-green-600 hover:bg-green-700"
+          className="w-full bg-green-600 hover:bg-green-700 sm:w-auto"
         >
-          <CheckCircle className="mr-2 h-4 w-4" />
-          {isSaving ? "Finalizando..." : "Finalizar Atendimento"}
+          <CheckCircle className="mr-1 h-4 w-4 sm:mr-2" />
+          <span className="hidden sm:inline">
+            {isSaving ? "Finalizando..." : "Finalizar Atendimento"}
+          </span>
+          <span className="sm:hidden">
+            {isSaving ? "Finalizando" : "Finalizar"}
+          </span>
         </Button>
       )}
     </div>

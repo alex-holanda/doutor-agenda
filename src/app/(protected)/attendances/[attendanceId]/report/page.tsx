@@ -39,8 +39,11 @@ export default async function ReportPage({ params }: ReportPageProps) {
     headers: await headers(),
   });
 
-  if (!session) {
-    redirect("/login");
+  if (!session?.user) {
+    redirect("/authentication");
+  }
+  if (!session?.user?.clinic) {
+    redirect("/clinic-form");
   }
 
   const { attendanceId } = await params;
@@ -93,16 +96,12 @@ export default async function ReportPage({ params }: ReportPageProps) {
         return null;
       }
 
-      const doctorQuestionnaire =
-        await db.query.questionnairesTable.findFirst({
-          where: eq(
-            questionnairesTable.id,
-            response.questionnaireId,
-          ),
-          with: {
-            template: true,
-          },
-        });
+      const doctorQuestionnaire = await db.query.questionnairesTable.findFirst({
+        where: eq(questionnairesTable.id, response.questionnaireId),
+        with: {
+          template: true,
+        },
+      });
 
       if (!doctorQuestionnaire || !doctorQuestionnaire.templateId) {
         return null;

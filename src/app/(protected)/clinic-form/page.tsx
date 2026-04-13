@@ -12,19 +12,17 @@ import ClinicForm from "./_components/form";
 const ClinicFormPage = async () => {
   return (
     <WithAuthentication mustHavePlan>
-      <div>
-        <Dialog open>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Adicionar clínica</DialogTitle>
-              <DialogDescription>
-                Adicione uma clínica para continuar.
-              </DialogDescription>
-            </DialogHeader>
-            <ClinicForm />
-          </DialogContent>
-        </Dialog>
-      </div>
+      <Dialog open>
+        <DialogContent className="max-w-[425px]" showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>Adicionar clínica</DialogTitle>
+            <DialogDescription>
+              Adicione uma clínica para continuar.
+            </DialogDescription>
+          </DialogHeader>
+          <ClinicForm />
+        </DialogContent>
+      </Dialog>
     </WithAuthentication>
   );
 };

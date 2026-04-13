@@ -50,7 +50,9 @@ export function AttendanceFlow({
   const [isStarting, setIsStarting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [steps, setSteps] = useState<any[]>([]);
-  const [savedData, setSavedData] = useState<Record<string, Record<string, any>>>({});
+  const [savedData, setSavedData] = useState<
+    Record<string, Record<string, any>>
+  >({});
   const [isLoaded, setIsLoaded] = useState(false);
 
   const isWaiting = status === "waiting";
@@ -99,8 +101,8 @@ export function AttendanceFlow({
       const combinedData: Record<string, Record<string, any>> = {
         "vital-signs": saved.vitalSigns || {},
         "physical-exam": saved.physicalExam || {},
-        "prescription": saved.prescription || {},
-        "certificate": saved.certificate || {},
+        prescription: saved.prescription || {},
+        certificate: saved.certificate || {},
         ...saved.questionnaireResponses,
         ...(progress?.progressData || {}),
       };
@@ -113,7 +115,11 @@ export function AttendanceFlow({
         for (let i = dynamicSteps.length - 1; i >= 0; i--) {
           const stepId = dynamicSteps[i].id as string;
           const stepData = combinedData[stepId];
-          if (stepData && typeof stepData === 'object' && Object.keys(stepData).length > 0) {
+          if (
+            stepData &&
+            typeof stepData === "object" &&
+            Object.keys(stepData).length > 0
+          ) {
             restoredStep = i;
             break;
           }
@@ -293,12 +299,16 @@ export function AttendanceFlow({
         <Card className="bg-muted/50 border-primary/20">
           <CardContent className="pt-4">
             <div className="flex items-start gap-3">
-              <div className="rounded-full bg-primary/10 p-2">
-                <FileText className="h-4 w-4 text-primary" />
+              <div className="bg-primary/10 rounded-full p-2">
+                <FileText className="text-primary h-4 w-4" />
               </div>
               <div>
-                <p className="text-sm font-medium text-primary">Queixa Principal</p>
-                <p className="text-sm text-muted-foreground">{chiefComplaint}</p>
+                <p className="text-primary text-sm font-medium">
+                  Queixa Principal
+                </p>
+                <p className="text-muted-foreground text-sm">
+                  {chiefComplaint}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -307,9 +317,9 @@ export function AttendanceFlow({
 
       {/* Progresso */}
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="pt-4 md:pt-6">
           <div className="space-y-3">
-            <div className="flex justify-between text-sm">
+            <div className="flex flex-col gap-1 text-sm sm:flex-row sm:justify-between">
               <span className="text-muted-foreground">
                 Passo {currentStep + 1} de {steps.length}
               </span>
@@ -318,26 +328,29 @@ export function AttendanceFlow({
               </span>
             </div>
             <Progress value={percentage} className="h-2" />
-            <div
-              className="grid gap-2 text-center text-xs"
-              style={{
-                gridTemplateColumns: `repeat(${Math.min(steps.length, 6)}, 1fr)`,
-              }}
-            >
-              {steps.map((step, index) => (
-                <div
-                  key={step.id}
-                  className={`truncate ${
-                    index <= currentStep
-                      ? "text-primary font-medium"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  {step.title.length > 12
-                    ? step.title.substring(0, 10) + "..."
-                    : step.title}
-                </div>
-              ))}
+            <div className="overflow-x-auto">
+              <div
+                className="flex gap-1 text-center text-xs sm:grid"
+                style={{
+                  gridTemplateColumns: `repeat(${Math.min(steps.length, 6)}, 1fr)`,
+                  minWidth: steps.length > 4 ? "100%" : undefined,
+                }}
+              >
+                {steps.map((step, index) => (
+                  <div
+                    key={step.id}
+                    className={`truncate px-0.5 py-1 ${
+                      index <= currentStep
+                        ? "text-primary font-medium"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {step.title.length > 10
+                      ? step.title.substring(0, 8) + "..."
+                      : step.title}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </CardContent>

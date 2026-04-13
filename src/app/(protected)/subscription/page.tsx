@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 import {
   PageContainer,
@@ -18,6 +19,13 @@ const SubscriptionPage = async () => {
     headers: await headers(),
   });
 
+  if (!session?.user) {
+    redirect("/authentication");
+  }
+  if (!session?.user?.clinic) {
+    redirect("/clinic-form");
+  }
+
   return (
     <WithAuthentication mustHaveClinic>
       <PageContainer>
@@ -29,7 +37,7 @@ const SubscriptionPage = async () => {
         </PageHeader>
         <PageContent>
           <SubscriptionPlan
-            className="w-[350px]"
+            className="w-full max-w-[350px]"
             active={session!.user.plan === "essential"}
             userEmail={session!.user.email}
           />
