@@ -71,10 +71,8 @@ export default async function AttendancePage({ params }: AttendancePageProps) {
       <PageContainer>
         <PageHeader>
           <PageHeaderContent>
-            <PageTitle className="text-lg md:text-xl">
-              Atendimento Médico
-            </PageTitle>
-            <PageDescription className="text-xs md:text-sm">
+            <PageTitle>Atendimento Médico</PageTitle>
+            <PageDescription>
               {attendance.patient.name} - {attendance.doctor.specialty}
             </PageDescription>
           </PageHeaderContent>

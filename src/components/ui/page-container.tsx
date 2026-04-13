@@ -27,7 +27,7 @@ export const PageDescription = ({
 }: {
   children: React.ReactNode;
 }) => {
-  return <p className="text-muted-foreground text-sm">{children}</p>;
+  return <p className="text-muted-foreground text-xs md:text-sm">{children}</p>;
 };
 
 export const PageActions = ({ children }: { children: React.ReactNode }) => {
