@@ -21,7 +21,7 @@ import {
   prescriptionsTable,
   medicalCertificatesTable,
   questionnaireResponsesTable,
-  doctorQuestionnairesTable,
+  questionnairesTable,
   questionnaireTemplatesTable,
   questionnaireTemplateFieldsTable,
 } from "@/db/schema";
@@ -88,16 +88,16 @@ export default async function ReportPage({ params }: ReportPageProps) {
 
   const questionnairesWithDetails = await Promise.all(
     questionnaireResponses.map(async (response) => {
-      // Verificar se doctorQuestionnaireId existe
-      if (!response.doctorQuestionnaireId) {
+      // Verificar se questionnaireId existe
+      if (!response.questionnaireId) {
         return null;
       }
 
       const doctorQuestionnaire =
-        await db.query.doctorQuestionnairesTable.findFirst({
+        await db.query.questionnairesTable.findFirst({
           where: eq(
-            doctorQuestionnairesTable.id,
-            response.doctorQuestionnaireId,
+            questionnairesTable.id,
+            response.questionnaireId,
           ),
           with: {
             template: true,

@@ -10,7 +10,7 @@ import { db } from "@/db";
 import {
   questionnaireTemplatesTable,
   questionnaireTemplateFieldsTable,
-  questionFieldsCatalogTable,
+  questionnaireFieldsTable,
 } from "@/db/schema";
 import { auth } from "@/lib/auth";
 

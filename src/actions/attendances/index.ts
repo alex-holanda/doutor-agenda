@@ -13,7 +13,7 @@ import {
   medicalCertificatesTable,
   questionnaireResponsesTable,
   attendancesTable,
-  doctorQuestionnairesTable,
+  questionnairesTable,
   questionnaireTemplateFieldsTable,
 } from "@/db/schema";
 import { auth } from "@/lib/auth";
@@ -38,6 +38,54 @@ export async function startAttendance(attendanceId: string) {
 
   revalidatePath(`/attendances/${attendanceId}`);
   return { success: true };
+}
+
+// Salvar progresso do atendimento
+export async function saveAttendanceProgress(
+  attendanceId: string,
+  currentStep: number,
+  progressData: Record<string, any>,
+) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    throw new Error("Não autorizado");
+  }
+
+  await db
+    .update(attendancesTable)
+    .set({
+      currentStep,
+      progressData,
+      updatedAt: new Date(),
+    })
+    .where(eq(attendancesTable.id, attendanceId));
+
+  revalidatePath(`/attendances/${attendanceId}`);
+  return { success: true };
+}
+
+// Buscar progresso do atendimento
+export async function getAttendanceProgress(attendanceId: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    throw new Error("Não autorizado");
+  }
+
+  const attendance = await db.query.attendancesTable.findFirst({
+    where: eq(attendancesTable.id, attendanceId),
+    columns: {
+      currentStep: true,
+      progressData: true,
+    },
+  });
+
+  return attendance;
 }
 
 // Finalizar atendimento
@@ -73,8 +121,8 @@ export async function getDoctorQuestionnaires(doctorId: string) {
     throw new Error("Não autorizado");
   }
 
-  const questionnaires = await db.query.doctorQuestionnairesTable.findMany({
-    where: eq(doctorQuestionnairesTable.doctorId, doctorId),
+  const questionnaires = await db.query.questionnairesTable.findMany({
+    where: eq(questionnairesTable.doctorId, doctorId),
     with: {
       template: true,
     },
@@ -133,8 +181,8 @@ export async function getAttendanceData(attendanceId: string) {
 
   const responsesMap: Record<string, any> = {};
   questionnaireResponses.forEach((resp) => {
-    if (resp.doctorQuestionnaireId) {
-      responsesMap[resp.doctorQuestionnaireId] = resp.responseData;
+    if (resp.questionnaireId) {
+      responsesMap[resp.questionnaireId] = resp.responseData;
     }
   });
 
@@ -381,8 +429,8 @@ export async function saveQuestionnaireResponse(
   }
 
   const doctorQuestionnaire =
-    await db.query.doctorQuestionnairesTable.findFirst({
-      where: eq(doctorQuestionnairesTable.id, questionnaireId),
+    await db.query.questionnairesTable.findFirst({
+      where: eq(questionnairesTable.id, questionnaireId),
     });
 
   if (!doctorQuestionnaire) {
@@ -392,7 +440,7 @@ export async function saveQuestionnaireResponse(
   const existing = await db.query.questionnaireResponsesTable.findFirst({
     where: and(
       eq(questionnaireResponsesTable.attendanceId, attendanceId),
-      eq(questionnaireResponsesTable.doctorQuestionnaireId, questionnaireId),
+      eq(questionnaireResponsesTable.questionnaireId, questionnaireId),
     ),
   });
 
@@ -407,7 +455,7 @@ export async function saveQuestionnaireResponse(
   } else {
     await db.insert(questionnaireResponsesTable).values({
       attendanceId,
-      doctorQuestionnaireId: questionnaireId,
+      questionnaireId: questionnaireId,
       answeredBy: "doctor",
       responseData,
       completedAt: new Date(),

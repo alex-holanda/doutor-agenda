@@ -1,12 +1,12 @@
 // src/app/(protected)/attendances/[attendanceId]/_components/attendance-flow.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Play } from "lucide-react";
+import { Play, FileText } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -19,6 +19,8 @@ import {
   saveCertificate,
   completeAttendance,
   saveQuestionnaireResponse,
+  saveAttendanceProgress,
+  getAttendanceProgress,
 } from "@/actions/attendances";
 import { VitalSignsStep } from "./vital-signs-step";
 import { PhysicalExamStep } from "./physical-exam-step";
@@ -48,11 +50,24 @@ export function AttendanceFlow({
   const [isStarting, setIsStarting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [steps, setSteps] = useState<any[]>([]);
-  const [savedData, setSavedData] = useState<Record<string, any>>({});
+  const [savedData, setSavedData] = useState<Record<string, Record<string, any>>>({});
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const isWaiting = status === "waiting";
   const percentage =
     steps.length > 0 ? ((currentStep + 1) / steps.length) * 100 : 0;
+
+  // Salvar progresso no servidor
+  const saveProgress = useCallback(
+    async (step: number, data: Record<string, any>) => {
+      try {
+        await saveAttendanceProgress(attendanceId, step, data);
+      } catch (error) {
+        console.error("Erro ao salvar progresso:", error);
+      }
+    },
+    [attendanceId],
+  );
 
   // Carregar dados
   useEffect(() => {
@@ -62,13 +77,9 @@ export function AttendanceFlow({
 
       // Buscar dados já salvos
       const saved = await getAttendanceData(attendanceId);
-      setSavedData({
-        vitalSigns: saved.vitalSigns,
-        physicalExam: saved.physicalExam,
-        prescription: saved.prescription,
-        certificate: saved.certificate,
-        ...saved.questionnaireResponses,
-      });
+
+      // Buscar progresso salvo
+      const progress = await getAttendanceProgress(attendanceId);
 
       // Construir steps dinamicamente
       const dynamicSteps = [
@@ -83,9 +94,44 @@ export function AttendanceFlow({
         { id: "certificate", title: "Atestado" },
       ];
       setSteps(dynamicSteps);
+
+      // Combinar dados salvos com progresso
+      const combinedData: Record<string, Record<string, any>> = {
+        "vital-signs": saved.vitalSigns || {},
+        "physical-exam": saved.physicalExam || {},
+        "prescription": saved.prescription || {},
+        "certificate": saved.certificate || {},
+        ...saved.questionnaireResponses,
+        ...(progress?.progressData || {}),
+      };
+      setSavedData(combinedData);
+
+      // Restaurar step salvo ou continuar do último dado preenchido
+      let restoredStep = progress?.currentStep || 0;
+      if (restoredStep === 0) {
+        // Buscar o último step com dados
+        for (let i = dynamicSteps.length - 1; i >= 0; i--) {
+          const stepId = dynamicSteps[i].id as string;
+          const stepData = combinedData[stepId];
+          if (stepData && typeof stepData === 'object' && Object.keys(stepData).length > 0) {
+            restoredStep = i;
+            break;
+          }
+        }
+      }
+
+      setCurrentStep(restoredStep);
+      setIsLoaded(true);
     }
     loadData();
   }, [doctorId, attendanceId]);
+
+  // Salvar progresso quando step mudar
+  useEffect(() => {
+    if (isLoaded && !isWaiting && steps.length > 0) {
+      saveProgress(currentStep, savedData);
+    }
+  }, [currentStep, isLoaded, isWaiting, steps.length, saveProgress, savedData]);
 
   const handleStart = async () => {
     setIsStarting(true);
@@ -100,8 +146,6 @@ export function AttendanceFlow({
       setIsStarting(false);
     }
   };
-
-  // Dentro do handleSaveCurrentStep, adicione validação
 
   const handleSaveCurrentStep = async () => {
     const step = steps[currentStep];
@@ -167,7 +211,10 @@ export function AttendanceFlow({
         await saveQuestionnaireResponse(attendanceId, step.id, data);
       }
 
-      setSavedData((prev) => ({ ...prev, [step.id]: data }));
+      const newSavedData = { ...savedData, [step.id]: data };
+      setSavedData(newSavedData);
+      await saveProgress(currentStep, newSavedData);
+
       return true;
     } catch (error) {
       console.error(error);
@@ -181,7 +228,8 @@ export function AttendanceFlow({
   const handleNext = async () => {
     const saved = await handleSaveCurrentStep();
     if (saved && currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
+      const newStep = currentStep + 1;
+      setCurrentStep(newStep);
     }
   };
 
@@ -240,6 +288,23 @@ export function AttendanceFlow({
 
   return (
     <div className="space-y-6">
+      {/* Queixa do Paciente */}
+      {chiefComplaint && (
+        <Card className="bg-muted/50 border-primary/20">
+          <CardContent className="pt-4">
+            <div className="flex items-start gap-3">
+              <div className="rounded-full bg-primary/10 p-2">
+                <FileText className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-primary">Queixa Principal</p>
+                <p className="text-sm text-muted-foreground">{chiefComplaint}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Progresso */}
       <Card>
         <CardContent className="pt-6">

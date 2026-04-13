@@ -1,5 +1,5 @@
 {
-  "id": "5436149b-fbb4-4cb6-8df5-4d9524da2db6",
+  "id": "2dc7deb6-cc9b-440e-8253-acd06c89c4f3",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -93,36 +93,6 @@
           "columns": [
             {
               "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_accounts_provider_id": {
-          "name": "idx_accounts_provider_id",
-          "columns": [
-            {
-              "expression": "provider_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_accounts_account_id": {
-          "name": "idx_accounts_account_id",
-          "columns": [
-            {
-              "expression": "account_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -240,36 +210,6 @@
           "method": "btree",
           "with": {}
         },
-        "idx_appointments_clinic_id": {
-          "name": "idx_appointments_clinic_id",
-          "columns": [
-            {
-              "expression": "clinic_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_appointments_patient_id": {
-          "name": "idx_appointments_patient_id",
-          "columns": [
-            {
-              "expression": "patient_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "idx_appointments_doctor_id": {
           "name": "idx_appointments_doctor_id",
           "columns": [
@@ -285,53 +225,11 @@
           "method": "btree",
           "with": {}
         },
-        "idx_appointments_status": {
-          "name": "idx_appointments_status",
-          "columns": [
-            {
-              "expression": "status",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_appointments_doctor_date": {
-          "name": "idx_appointments_doctor_date",
-          "columns": [
-            {
-              "expression": "doctor_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "date",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_appointments_patient_date": {
-          "name": "idx_appointments_patient_date",
+        "idx_appointments_patient_id": {
+          "name": "idx_appointments_patient_id",
           "columns": [
             {
               "expression": "patient_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "date",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -471,6 +369,19 @@
           "primaryKey": false,
           "notNull": false
         },
+        "current_step": {
+          "name": "current_step",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "progress_data": {
+          "name": "progress_data",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -532,96 +443,9 @@
           "method": "btree",
           "with": {}
         },
-        "idx_attendances_appointment_id": {
-          "name": "idx_attendances_appointment_id",
-          "columns": [
-            {
-              "expression": "appointment_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "idx_attendances_status": {
           "name": "idx_attendances_status",
           "columns": [
-            {
-              "expression": "status",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_attendances_type": {
-          "name": "idx_attendances_type",
-          "columns": [
-            {
-              "expression": "type",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_attendances_actual_start_time": {
-          "name": "idx_attendances_actual_start_time",
-          "columns": [
-            {
-              "expression": "actual_start_time",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_attendances_doctor_status": {
-          "name": "idx_attendances_doctor_status",
-          "columns": [
-            {
-              "expression": "doctor_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "status",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_attendances_patient_status": {
-          "name": "idx_attendances_patient_status",
-          "columns": [
-            {
-              "expression": "patient_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
             {
               "expression": "status",
               "isExpression": false,
@@ -766,185 +590,9 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
-        },
-        "idx_clinics_cnpj": {
-          "name": "idx_clinics_cnpj",
-          "columns": [
-            {
-              "expression": "cnpj",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_clinics_email": {
-          "name": "idx_clinics_email",
-          "columns": [
-            {
-              "expression": "email",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
         }
       },
       "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "clinics_cnpj_unique": {
-          "name": "clinics_cnpj_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "cnpj"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.doctor_questionnaires": {
-      "name": "doctor_questionnaires",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "doctor_id": {
-          "name": "doctor_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "template_id": {
-          "name": "template_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "is_active": {
-          "name": "is_active",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": true
-        },
-        "customizations": {
-          "name": "customizations",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "idx_doctor_questionnaires_doctor_id": {
-          "name": "idx_doctor_questionnaires_doctor_id",
-          "columns": [
-            {
-              "expression": "doctor_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_doctor_questionnaires_template_id": {
-          "name": "idx_doctor_questionnaires_template_id",
-          "columns": [
-            {
-              "expression": "template_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_doctor_questionnaires_is_active": {
-          "name": "idx_doctor_questionnaires_is_active",
-          "columns": [
-            {
-              "expression": "is_active",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "doctor_questionnaires_doctor_id_doctors_id_fk": {
-          "name": "doctor_questionnaires_doctor_id_doctors_id_fk",
-          "tableFrom": "doctor_questionnaires",
-          "tableTo": "doctors",
-          "columnsFrom": [
-            "doctor_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "doctor_questionnaires_template_id_questionnaire_templates_id_fk": {
-          "name": "doctor_questionnaires_template_id_questionnaire_templates_id_fk",
-          "tableFrom": "doctor_questionnaires",
-          "tableTo": "questionnaire_templates",
-          "columnsFrom": [
-            "template_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -1107,51 +755,6 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
-        },
-        "idx_doctors_crm": {
-          "name": "idx_doctors_crm",
-          "columns": [
-            {
-              "expression": "crm",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_doctors_email": {
-          "name": "idx_doctors_email",
-          "columns": [
-            {
-              "expression": "email",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_doctors_is_active": {
-          "name": "idx_doctors_is_active",
-          "columns": [
-            {
-              "expression": "is_active",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
         }
       },
       "foreignKeys": {
@@ -1271,36 +874,6 @@
           "columns": [
             {
               "expression": "attendance_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_medical_certificates_cid_code": {
-          "name": "idx_medical_certificates_cid_code",
-          "columns": [
-            {
-              "expression": "cid_code",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_medical_certificates_issued_at": {
-          "name": "idx_medical_certificates_issued_at",
-          "columns": [
-            {
-              "expression": "issued_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1496,81 +1069,6 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
-        },
-        "idx_patients_email": {
-          "name": "idx_patients_email",
-          "columns": [
-            {
-              "expression": "email",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_patients_phone_number": {
-          "name": "idx_patients_phone_number",
-          "columns": [
-            {
-              "expression": "phone_number",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_patients_birth_date": {
-          "name": "idx_patients_birth_date",
-          "columns": [
-            {
-              "expression": "birth_date",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_patients_insurance": {
-          "name": "idx_patients_insurance",
-          "columns": [
-            {
-              "expression": "insurance",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_patients_is_active": {
-          "name": "idx_patients_is_active",
-          "columns": [
-            {
-              "expression": "is_active",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
         }
       },
       "foreignKeys": {
@@ -1595,6 +1093,46 @@
           "nullsNotDistinct": false,
           "columns": [
             "cpf"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.permissions": {
+      "name": "permissions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "permissions_name_unique": {
+          "name": "permissions_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
           ]
         }
       },
@@ -1722,36 +1260,6 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
-        },
-        "idx_physical_exams_examined_at": {
-          "name": "idx_physical_exams_examined_at",
-          "columns": [
-            {
-              "expression": "examined_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_physical_exams_examined_by": {
-          "name": "idx_physical_exams_examined_by",
-          "columns": [
-            {
-              "expression": "examined_by",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
         }
       },
       "foreignKeys": {
@@ -1804,7 +1312,7 @@
           "name": "medications",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "exams": {
           "name": "exams",
@@ -1861,36 +1369,6 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
-        },
-        "idx_prescriptions_status": {
-          "name": "idx_prescriptions_status",
-          "columns": [
-            {
-              "expression": "status",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_prescriptions_return_date": {
-          "name": "idx_prescriptions_return_date",
-          "columns": [
-            {
-              "expression": "return_date",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
         }
       },
       "foreignKeys": {
@@ -1914,8 +1392,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.question_fields_catalog": {
-      "name": "question_fields_catalog",
+    "public.questionnaire_fields": {
+      "name": "questionnaire_fields",
       "schema": "",
       "columns": {
         "id": {
@@ -2036,8 +1514,8 @@
         }
       },
       "indexes": {
-        "idx_question_fields_category": {
-          "name": "idx_question_fields_category",
+        "idx_questionnaire_fields_category": {
+          "name": "idx_questionnaire_fields_category",
           "columns": [
             {
               "expression": "category",
@@ -2051,38 +1529,8 @@
           "method": "btree",
           "with": {}
         },
-        "idx_question_fields_field_type": {
-          "name": "idx_question_fields_field_type",
-          "columns": [
-            {
-              "expression": "field_type",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_question_fields_is_active": {
-          "name": "idx_question_fields_is_active",
-          "columns": [
-            {
-              "expression": "is_active",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_question_fields_field_key": {
-          "name": "idx_question_fields_field_key",
+        "idx_questionnaire_fields_key": {
+          "name": "idx_questionnaire_fields_key",
           "columns": [
             {
               "expression": "field_key",
@@ -2100,8 +1548,8 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "question_fields_catalog_field_key_unique": {
-          "name": "question_fields_catalog_field_key_unique",
+        "questionnaire_fields_field_key_unique": {
+          "name": "questionnaire_fields_field_key_unique",
           "nullsNotDistinct": false,
           "columns": [
             "field_key"
@@ -2129,11 +1577,11 @@
           "primaryKey": false,
           "notNull": true
         },
-        "doctor_questionnaire_id": {
-          "name": "doctor_questionnaire_id",
+        "questionnaire_id": {
+          "name": "questionnaire_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "answered_by": {
           "name": "answered_by",
@@ -2190,41 +1638,11 @@
           "method": "btree",
           "with": {}
         },
-        "idx_questionnaire_responses_doctor_questionnaire_id": {
-          "name": "idx_questionnaire_responses_doctor_questionnaire_id",
+        "idx_questionnaire_responses_questionnaire_id": {
+          "name": "idx_questionnaire_responses_questionnaire_id",
           "columns": [
             {
-              "expression": "doctor_questionnaire_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_questionnaire_responses_answered_by": {
-          "name": "idx_questionnaire_responses_answered_by",
-          "columns": [
-            {
-              "expression": "answered_by",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_questionnaire_responses_completed_at": {
-          "name": "idx_questionnaire_responses_completed_at",
-          "columns": [
-            {
-              "expression": "completed_at",
+              "expression": "questionnaire_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -2250,17 +1668,17 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "questionnaire_responses_doctor_questionnaire_id_doctor_questionnaires_id_fk": {
-          "name": "questionnaire_responses_doctor_questionnaire_id_doctor_questionnaires_id_fk",
+        "questionnaire_responses_questionnaire_id_questionnaires_id_fk": {
+          "name": "questionnaire_responses_questionnaire_id_questionnaires_id_fk",
           "tableFrom": "questionnaire_responses",
-          "tableTo": "doctor_questionnaires",
+          "tableTo": "questionnaires",
           "columnsFrom": [
-            "doctor_questionnaire_id"
+            "questionnaire_id"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
@@ -2329,26 +1747,11 @@
         }
       },
       "indexes": {
-        "idx_template_fields_template_id": {
-          "name": "idx_template_fields_template_id",
+        "idx_questionnaire_template_fields_template_id": {
+          "name": "idx_questionnaire_template_fields_template_id",
           "columns": [
             {
               "expression": "template_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_template_fields_field_id": {
-          "name": "idx_template_fields_field_id",
-          "columns": [
-            {
-              "expression": "field_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -2374,10 +1777,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "questionnaire_template_fields_field_id_question_fields_catalog_id_fk": {
-          "name": "questionnaire_template_fields_field_id_question_fields_catalog_id_fk",
+        "questionnaire_template_fields_field_id_questionnaire_fields_id_fk": {
+          "name": "questionnaire_template_fields_field_id_questionnaire_fields_id_fk",
           "tableFrom": "questionnaire_template_fields",
-          "tableTo": "question_fields_catalog",
+          "tableTo": "questionnaire_fields",
           "columnsFrom": [
             "field_id"
           ],
@@ -2433,12 +1836,6 @@
         },
         "clinic_id": {
           "name": "clinic_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "doctor_id": {
-          "name": "doctor_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
@@ -2508,56 +1905,11 @@
           "method": "btree",
           "with": {}
         },
-        "idx_questionnaire_templates_category_type": {
-          "name": "idx_questionnaire_templates_category_type",
-          "columns": [
-            {
-              "expression": "category_type",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "idx_questionnaire_templates_clinic_id": {
           "name": "idx_questionnaire_templates_clinic_id",
           "columns": [
             {
               "expression": "clinic_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_questionnaire_templates_doctor_id": {
-          "name": "idx_questionnaire_templates_doctor_id",
-          "columns": [
-            {
-              "expression": "doctor_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_questionnaire_templates_is_active": {
-          "name": "idx_questionnaire_templates_is_active",
-          "columns": [
-            {
-              "expression": "is_active",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -2582,10 +1934,92 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.questionnaires": {
+      "name": "questionnaires",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
-        "questionnaire_templates_doctor_id_doctors_id_fk": {
-          "name": "questionnaire_templates_doctor_id_doctors_id_fk",
-          "tableFrom": "questionnaire_templates",
+        "doctor_id": {
+          "name": "doctor_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "template_id": {
+          "name": "template_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "customizations": {
+          "name": "customizations",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_questionnaires_doctor_id": {
+          "name": "idx_questionnaires_doctor_id",
+          "columns": [
+            {
+              "expression": "doctor_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "questionnaires_doctor_id_doctors_id_fk": {
+          "name": "questionnaires_doctor_id_doctors_id_fk",
+          "tableFrom": "questionnaires",
           "tableTo": "doctors",
           "columnsFrom": [
             "doctor_id"
@@ -2594,6 +2028,82 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "questionnaires_template_id_questionnaire_templates_id_fk": {
+          "name": "questionnaires_template_id_questionnaire_templates_id_fk",
+          "tableFrom": "questionnaires",
+          "tableTo": "questionnaire_templates",
+          "columnsFrom": [
+            "template_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.role_permissions": {
+      "name": "role_permissions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "role": {
+          "name": "role",
+          "type": "user_role",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "permission_id": {
+          "name": "permission_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_role_permissions_role": {
+          "name": "idx_role_permissions_role",
+          "columns": [
+            {
+              "expression": "role",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "role_permissions_permission_id_permissions_id_fk": {
+          "name": "role_permissions_permission_id_permissions_id_fk",
+          "tableFrom": "role_permissions",
+          "tableTo": "permissions",
+          "columnsFrom": [
+            "permission_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
@@ -2677,21 +2187,6 @@
           "columns": [
             {
               "expression": "token",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_sessions_expires_at": {
-          "name": "idx_sessions_expires_at",
-          "columns": [
-            {
-              "expression": "expires_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -2812,51 +2307,6 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
-        },
-        "idx_users_stripe_customer_id": {
-          "name": "idx_users_stripe_customer_id",
-          "columns": [
-            {
-              "expression": "stripe_customer_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_users_plan": {
-          "name": "idx_users_plan",
-          "columns": [
-            {
-              "expression": "plan",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_users_created_at": {
-          "name": "idx_users_created_at",
-          "columns": [
-            {
-              "expression": "created_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
         }
       },
       "foreignKeys": {},
@@ -2892,10 +2342,11 @@
         },
         "role": {
           "name": "role",
-          "type": "text",
+          "type": "user_role",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
-          "default": "'member'"
+          "default": "'receptionist'"
         },
         "created_at": {
           "name": "created_at",
@@ -2954,21 +2405,6 @@
             },
             {
               "expression": "clinic_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_users_to_clinics_role": {
-          "name": "idx_users_to_clinics_role",
-          "columns": [
-            {
-              "expression": "role",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -3061,21 +2497,6 @@
           "columns": [
             {
               "expression": "identifier",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_verifications_expires_at": {
-          "name": "idx_verifications_expires_at",
-          "columns": [
-            {
-              "expression": "expires_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -3226,36 +2647,6 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
-        },
-        "idx_vital_signs_measured_at": {
-          "name": "idx_vital_signs_measured_at",
-          "columns": [
-            {
-              "expression": "measured_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_vital_signs_measured_by": {
-          "name": "idx_vital_signs_measured_by",
-          "columns": [
-            {
-              "expression": "measured_by",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
         }
       },
       "foreignKeys": {
@@ -3343,6 +2734,17 @@
         "system",
         "clinic",
         "personal"
+      ]
+    },
+    "public.user_role": {
+      "name": "user_role",
+      "schema": "public",
+      "values": [
+        "super_admin",
+        "admin",
+        "doctor",
+        "nurse",
+        "receptionist"
       ]
     }
   },

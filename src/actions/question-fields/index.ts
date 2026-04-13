@@ -7,7 +7,7 @@ import { eq, and } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { questionFieldsCatalogTable } from "@/db/schema";
+import { questionnaireFieldsTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
 
 const fieldSchema = z.object({
@@ -47,8 +47,8 @@ export async function getQuestionFields() {
     throw new Error("Não autorizado");
   }
 
-  const fields = await db.query.questionFieldsCatalogTable.findMany({
-    where: eq(questionFieldsCatalogTable.isActive, true),
+  const fields = await db.query.questionnaireFieldsTable.findMany({
+    where: eq(questionnaireFieldsTable.isActive, true),
     orderBy: (fields, { asc }) => [asc(fields.category), asc(fields.order)],
   });
 
@@ -68,15 +68,15 @@ export async function createQuestionField(data: z.infer<typeof fieldSchema>) {
   const validated = fieldSchema.parse(data);
 
   // Verificar se field key já existe
-  const existing = await db.query.questionFieldsCatalogTable.findFirst({
-    where: eq(questionFieldsCatalogTable.fieldKey, validated.fieldKey),
+  const existing = await db.query.questionnaireFieldsTable.findFirst({
+    where: eq(questionnaireFieldsTable.fieldKey, validated.fieldKey),
   });
 
   if (existing) {
     throw new Error("Field key já existe");
   }
 
-  await db.insert(questionFieldsCatalogTable).values({
+  await db.insert(questionnaireFieldsTable).values({
     ...validated,
     isSystem: false,
     isActive: true,
@@ -101,8 +101,8 @@ export async function updateQuestionField(
   }
 
   // Verificar se é campo do sistema (não pode editar)
-  const existing = await db.query.questionFieldsCatalogTable.findFirst({
-    where: eq(questionFieldsCatalogTable.id, id),
+  const existing = await db.query.questionnaireFieldsTable.findFirst({
+    where: eq(questionnaireFieldsTable.id, id),
   });
 
   if (existing?.isSystem) {
@@ -110,12 +110,12 @@ export async function updateQuestionField(
   }
 
   await db
-    .update(questionFieldsCatalogTable)
+    .update(questionnaireFieldsTable)
     .set({
       ...data,
       updatedAt: new Date(),
     })
-    .where(eq(questionFieldsCatalogTable.id, id));
+    .where(eq(questionnaireFieldsTable.id, id));
 
   revalidatePath("/question-fields");
   return { success: true };
@@ -132,8 +132,8 @@ export async function deleteQuestionField(id: string) {
   }
 
   // Verificar se é campo do sistema (não pode excluir)
-  const existing = await db.query.questionFieldsCatalogTable.findFirst({
-    where: eq(questionFieldsCatalogTable.id, id),
+  const existing = await db.query.questionnaireFieldsTable.findFirst({
+    where: eq(questionnaireFieldsTable.id, id),
   });
 
   if (existing?.isSystem) {
@@ -141,12 +141,12 @@ export async function deleteQuestionField(id: string) {
   }
 
   await db
-    .update(questionFieldsCatalogTable)
+    .update(questionnaireFieldsTable)
     .set({
       isActive: false,
       updatedAt: new Date(),
     })
-    .where(eq(questionFieldsCatalogTable.id, id));
+    .where(eq(questionnaireFieldsTable.id, id));
 
   revalidatePath("/question-fields");
   return { success: true };

@@ -22,25 +22,47 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
   Search,
   MoreVertical,
   Eye,
-  FileEdit,
   Trash2,
-  Play,
-  User,
+  FileEdit,
   FileText,
+  User,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
-import { deleteQuestionnaire } from "@/actions/my-questionnaires";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  deleteQuestionnaire,
+  updateQuestionnaire,
+} from "@/actions/my-questionnaires";
 
 interface QuestionnairesListProps {
   questionnaires: any[];
@@ -48,6 +70,10 @@ interface QuestionnairesListProps {
   search?: string;
   doctorId?: string;
 }
+
+const editFormSchema = z.object({
+  name: z.string().min(1, "Nome é obrigatório"),
+});
 
 export function QuestionnairesList({
   questionnaires,
@@ -60,6 +86,15 @@ export function QuestionnairesList({
   const [selectedDoctorId, setSelectedDoctorId] = useState(
     initialDoctorId || "all",
   );
+  const [editingQuestionnaire, setEditingQuestionnaire] = useState<any>(null);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const editForm = useForm({
+    resolver: zodResolver(editFormSchema),
+    defaultValues: {
+      name: "",
+    },
+  });
 
   const handleSearch = () => {
     const params = new URLSearchParams();
@@ -87,8 +122,29 @@ export function QuestionnairesList({
     }
   };
 
-  const handleUse = (questionnaireId: string) => {
-    toast.info("Em desenvolvimento - Integração com atendimentos");
+  const handleEdit = (questionnaire: any) => {
+    setEditingQuestionnaire(questionnaire);
+    editForm.reset({
+      name: questionnaire.name,
+    });
+    setIsEditing(true);
+  };
+
+  const handleSaveEdit = async (data: z.infer<typeof editFormSchema>) => {
+    if (!editingQuestionnaire) return;
+
+    try {
+      await updateQuestionnaire(editingQuestionnaire.id, {
+        name: data.name,
+      });
+      toast.success("Questionário atualizado com sucesso");
+      setIsEditing(false);
+      setEditingQuestionnaire(null);
+      editForm.reset();
+      router.refresh();
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao atualizar questionário");
+    }
   };
 
   if (questionnaires.length === 0) {
@@ -110,7 +166,7 @@ export function QuestionnairesList({
         <div className="relative flex-1">
           <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
-            placeholder="Buscar por nome do questionário ou médico..."
+            placeholder="Buscar por nome do questionário..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyPress={handleKeyPress}
@@ -145,30 +201,22 @@ export function QuestionnairesList({
                   {questionnaire.template?.category || "Personalizado"}
                 </Badge>
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
+                  <DropdownMenuTrigger>
+                    <Button variant="ghost" size="icon" type="button">
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      onClick={() =>
-                        router.push(`/my-questionnaires/${questionnaire.id}`)
-                      }
-                    >
+                    <DropdownMenuItem onSelect={() => router.push(`/my-questionnaires/${questionnaire.id}`)}>
                       <Eye className="mr-2 h-4 w-4" />
                       Visualizar
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleUse(questionnaire.id)}
-                    >
-                      <Play className="mr-2 h-4 w-4" />
-                      Usar no Atendimento
+                    <DropdownMenuItem onSelect={() => handleEdit(questionnaire)}>
+                      <FileEdit className="mr-2 h-4 w-4" />
+                      Editar
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleDelete(questionnaire.id)}
-                      className="text-red-600"
-                    >
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={() => handleDelete(questionnaire.id)} className="text-red-600">
                       <Trash2 className="mr-2 h-4 w-4" />
                       Excluir
                     </DropdownMenuItem>
@@ -212,28 +260,63 @@ export function QuestionnairesList({
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="flex gap-2">
+            <CardFooter>
               <Button
                 variant="outline"
-                className="flex-1"
-                onClick={() => handleUse(questionnaire.id)}
-              >
-                <Play className="mr-2 h-4 w-4" />
-                Usar
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
+                className="w-full"
                 onClick={() =>
                   router.push(`/my-questionnaires/${questionnaire.id}`)
                 }
               >
-                <Eye className="h-4 w-4" />
+                <Eye className="mr-2 h-4 w-4" />
+                Visualizar
               </Button>
             </CardFooter>
           </Card>
         ))}
       </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditing} onOpenChange={setIsEditing}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Questionário</DialogTitle>
+            <DialogDescription>
+              Altere o nome do questionário
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...editForm}>
+            <form
+              onSubmit={editForm.handleSubmit(handleSaveEdit)}
+              className="space-y-4"
+            >
+              <FormField
+                control={editForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditing(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit">Salvar</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

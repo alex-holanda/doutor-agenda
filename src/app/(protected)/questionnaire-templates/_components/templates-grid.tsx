@@ -24,8 +24,17 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Search,
   MoreVertical,
@@ -42,9 +51,21 @@ import { toast } from "sonner";
 import {
   deleteQuestionnaireTemplate,
   duplicateQuestionnaireTemplate,
+  updateQuestionnaireTemplate,
 } from "@/actions/questionnaire-templates";
 import { TemplatePreviewDialog } from "./template-preview-dialog";
-import { UseTemplateDialog } from "./use-template-dialog";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
 
 interface TemplatesGridProps {
   templates: any[];
@@ -74,6 +95,11 @@ const categoryLabels: Record<string, string> = {
   custom: "Personalizado",
 };
 
+const editFormSchema = z.object({
+  name: z.string().min(1, "Nome é obrigatório"),
+  description: z.string().optional(),
+});
+
 export function TemplatesGrid({
   templates: initialTemplates,
 }: TemplatesGridProps) {
@@ -81,7 +107,16 @@ export function TemplatesGrid({
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [previewTemplate, setPreviewTemplate] = useState<any>(null);
-  const [useTemplate, setUseTemplate] = useState<any>(null);
+  const [editingTemplate, setEditingTemplate] = useState<any>(null);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const editForm = useForm({
+    resolver: zodResolver(editFormSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+    },
+  });
 
   const filteredTemplates = templates.filter((template) => {
     const matchesSearch =
@@ -116,6 +151,33 @@ export function TemplatesGrid({
       window.location.reload();
     } catch (error: any) {
       toast.error(error.message || "Erro ao excluir template");
+    }
+  };
+
+  const handleEdit = (template: any) => {
+    setEditingTemplate(template);
+    editForm.reset({
+      name: template.name,
+      description: template.description || "",
+    });
+    setIsEditing(true);
+  };
+
+  const handleSaveEdit = async (data: z.infer<typeof editFormSchema>) => {
+    if (!editingTemplate) return;
+
+    try {
+      await updateQuestionnaireTemplate(editingTemplate.id, {
+        name: data.name,
+        description: data.description,
+      });
+      toast.success("Template atualizado com sucesso");
+      setIsEditing(false);
+      setEditingTemplate(null);
+      editForm.reset();
+      window.location.reload();
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao atualizar template");
     }
   };
 
@@ -166,36 +228,28 @@ export function TemplatesGrid({
                       <Icon className="h-5 w-5" />
                     </div>
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                      <DropdownMenuTrigger>
+                        <Button variant="ghost" size="icon" type="button">
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => setPreviewTemplate(template)}
-                        >
+                        <DropdownMenuItem onSelect={() => setPreviewTemplate(template)}>
                           <Eye className="mr-2 h-4 w-4" />
                           Visualizar
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleDuplicate(template.id)}
-                        >
+                        <DropdownMenuItem onSelect={() => handleDuplicate(template.id)}>
                           <Copy className="mr-2 h-4 w-4" />
                           Duplicar
                         </DropdownMenuItem>
                         {!template.isSystem && (
                           <>
-                            <DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onSelect={() => handleEdit(template)}>
                               <FileEdit className="mr-2 h-4 w-4" />
                               Editar
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() =>
-                                handleDelete(template.id, template.isSystem)
-                              }
-                              className="text-red-600"
-                            >
+                            <DropdownMenuItem onSelect={() => handleDelete(template.id, template.isSystem)} className="text-red-600">
                               <Trash2 className="mr-2 h-4 w-4" />
                               Excluir
                             </DropdownMenuItem>
@@ -232,21 +286,14 @@ export function TemplatesGrid({
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="flex gap-2">
+                <CardFooter>
                   <Button
                     variant="outline"
-                    className="flex-1"
+                    className="w-full"
                     onClick={() => setPreviewTemplate(template)}
                   >
                     <Eye className="mr-2 h-4 w-4" />
                     Visualizar
-                  </Button>
-                  <Button
-                    className="flex-1"
-                    onClick={() => setUseTemplate(template)}
-                  >
-                    <Copy className="mr-2 h-4 w-4" />
-                    Usar Template
                   </Button>
                 </CardFooter>
               </Card>
@@ -262,12 +309,60 @@ export function TemplatesGrid({
         template={previewTemplate}
       />
 
-      {/* Use Template Dialog */}
-      <UseTemplateDialog
-        open={!!useTemplate}
-        onOpenChange={() => setUseTemplate(null)}
-        template={useTemplate}
-      />
+      {/* Edit Dialog */}
+      <Dialog open={isEditing} onOpenChange={setIsEditing}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Template</DialogTitle>
+            <DialogDescription>
+              Altere os dados do template
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...editForm}>
+            <form
+              onSubmit={editForm.handleSubmit(handleSaveEdit)}
+              className="space-y-4"
+            >
+              <FormField
+                control={editForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={editForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditing(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit">Salvar</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

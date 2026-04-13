@@ -58,9 +58,8 @@ export default async function AttendancePage({ params }: AttendancePageProps) {
   };
 
   const type = typeConfig[attendance.type as keyof typeof typeConfig];
-  const isCompleted = attendance.status === "completed";
 
-  if (isCompleted) {
+  if (attendance.status === "completed") {
     redirect(`/attendances/${attendanceId}/report`);
   }
 

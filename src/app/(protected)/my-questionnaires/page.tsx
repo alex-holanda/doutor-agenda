@@ -43,9 +43,9 @@ const MyQuestionnairesPage = async ({ searchParams }: PageProps) => {
       <PageContainer>
         <PageHeader>
           <PageHeaderContent>
-            <PageTitle>Meus Questionários</PageTitle>
+            <PageTitle>Questionários</PageTitle>
             <PageDescription>
-              Gerencie os questionários personalizados dos médicos
+              Questionários personalizados dos médicos da clínica
             </PageDescription>
           </PageHeaderContent>
           <PageActions>

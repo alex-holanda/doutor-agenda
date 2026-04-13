@@ -1,4 +1,3 @@
-// src/actions/my-questionnaire/index.ts
 "use server";
 
 import { headers } from "next/headers";
@@ -8,7 +7,7 @@ import { z } from "zod";
 
 import { db } from "@/db";
 import {
-  doctorQuestionnairesTable,
+  questionnairesTable,
   questionnaireTemplatesTable,
   questionnaireTemplateFieldsTable,
   doctorsTable,
@@ -16,15 +15,14 @@ import {
 } from "@/db/schema";
 import { auth } from "@/lib/auth";
 
-const doctorQuestionnaireSchema = z.object({
-  doctorId: z.string().uuid("Selecione um médico"),
+const questionnaireSchema = z.object({
+  doctorId: z.string().min(1, "Selecione um médico"),
   templateId: z.string().uuid("Selecione um template"),
   name: z.string().min(1, "Nome é obrigatório"),
 });
 
-// Criar questionário
-export async function createDoctorQuestionnaire(
-  data: z.infer<typeof doctorQuestionnaireSchema>,
+export async function createQuestionnaire(
+  data: z.infer<typeof questionnaireSchema>,
 ) {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -34,7 +32,7 @@ export async function createDoctorQuestionnaire(
     throw new Error("Não autorizado");
   }
 
-  const validated = doctorQuestionnaireSchema.parse(data);
+  const validated = questionnaireSchema.parse(data);
 
   const doctor = await db.query.doctorsTable.findFirst({
     where: and(
@@ -55,10 +53,10 @@ export async function createDoctorQuestionnaire(
     throw new Error("Template não encontrado");
   }
 
-  const existing = await db.query.doctorQuestionnairesTable.findFirst({
+  const existing = await db.query.questionnairesTable.findFirst({
     where: and(
-      eq(doctorQuestionnairesTable.doctorId, validated.doctorId),
-      eq(doctorQuestionnairesTable.name, validated.name),
+      eq(questionnairesTable.doctorId, validated.doctorId),
+      eq(questionnairesTable.name, validated.name),
     ),
   });
 
@@ -66,7 +64,7 @@ export async function createDoctorQuestionnaire(
     throw new Error("Já existe um questionário com este nome para este médico");
   }
 
-  await db.insert(doctorQuestionnairesTable).values({
+  await db.insert(questionnairesTable).values({
     doctorId: validated.doctorId,
     templateId: validated.templateId,
     name: validated.name,
@@ -85,7 +83,6 @@ export async function createDoctorQuestionnaire(
   return { success: true };
 }
 
-// Listar todos os questionários (com filtros)
 export async function getMyQuestionnaires(search?: string, doctorId?: string) {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -95,22 +92,38 @@ export async function getMyQuestionnaires(search?: string, doctorId?: string) {
     throw new Error("Não autorizado");
   }
 
-  const conditions = [];
-
-  if (doctorId) {
-    conditions.push(eq(doctorQuestionnairesTable.doctorId, doctorId));
-  }
-
-  const questionnaires = await db.query.doctorQuestionnairesTable.findMany({
-    where: and(eq(doctorQuestionnairesTable.isActive, true), ...conditions),
-    orderBy: [desc(doctorQuestionnairesTable.createdAt)],
+  // Buscar todos os médicos da clínica
+  const clinicDoctors = await db.query.doctorsTable.findMany({
+    where: eq(doctorsTable.clinicId, session.user.clinic.id),
   });
 
+  const doctorIds = clinicDoctors.map((d) => d.id);
+
+  if (doctorIds.length === 0) {
+    return [];
+  }
+
+  // Condições da query
+  const conditions = [eq(questionnairesTable.isActive, true)];
+
+  // Se filtrar por médico específico
+  if (doctorId && doctorIds.includes(doctorId)) {
+    conditions.push(eq(questionnairesTable.doctorId, doctorId));
+  }
+
+  const questionnaires = await db.query.questionnairesTable.findMany({
+    where: and(...conditions),
+    orderBy: [desc(questionnairesTable.createdAt)],
+  });
+
+  // Filtrar por médicos da clínica
+  const filteredQuestionnaires = questionnaires.filter((q) =>
+    doctorIds.includes(q.doctorId),
+  );
+
   const questionnairesWithDetails = await Promise.all(
-    questionnaires.map(async (q) => {
-      const doctor = await db.query.doctorsTable.findFirst({
-        where: eq(doctorsTable.id, q.doctorId),
-      });
+    filteredQuestionnaires.map(async (q) => {
+      const doctor = clinicDoctors.find((d) => d.id === q.doctorId);
 
       const template = await db.query.questionnaireTemplatesTable.findFirst({
         where: eq(questionnaireTemplatesTable.id, q.templateId),
@@ -125,12 +138,10 @@ export async function getMyQuestionnaires(search?: string, doctorId?: string) {
           orderBy: (fields, { asc }) => [asc(fields.order)],
         });
 
-      const lastResponse = await db.query.questionnaireResponsesTable.findFirst(
-        {
-          where: eq(questionnaireResponsesTable.doctorQuestionnaireId, q.id),
-          orderBy: [desc(questionnaireResponsesTable.createdAt)],
-        },
-      );
+      const lastResponse = await db.query.questionnaireResponsesTable.findFirst({
+        where: eq(questionnaireResponsesTable.questionnaireId, q.id),
+        orderBy: [desc(questionnaireResponsesTable.createdAt)],
+      });
 
       return {
         ...q,
@@ -162,7 +173,6 @@ export async function getMyQuestionnaires(search?: string, doctorId?: string) {
   return filtered;
 }
 
-// Obter questionário por ID
 export async function getQuestionnaireById(id: string) {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -172,8 +182,8 @@ export async function getQuestionnaireById(id: string) {
     throw new Error("Não autorizado");
   }
 
-  const questionnaire = await db.query.doctorQuestionnairesTable.findFirst({
-    where: eq(doctorQuestionnairesTable.id, id),
+  const questionnaire = await db.query.questionnairesTable.findFirst({
+    where: eq(questionnairesTable.id, id),
   });
 
   if (!questionnaire) {
@@ -212,8 +222,10 @@ export async function getQuestionnaireById(id: string) {
   };
 }
 
-// Atualizar questionário
-export async function updateQuestionnaire(id: string, data: { name: string }) {
+export async function updateQuestionnaire(
+  id: string,
+  data: { name: string },
+) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -223,18 +235,17 @@ export async function updateQuestionnaire(id: string, data: { name: string }) {
   }
 
   await db
-    .update(doctorQuestionnairesTable)
+    .update(questionnairesTable)
     .set({
       name: data.name,
       updatedAt: new Date(),
     })
-    .where(eq(doctorQuestionnairesTable.id, id));
+    .where(eq(questionnairesTable.id, id));
 
   revalidatePath("/my-questionnaires");
   return { success: true };
 }
 
-// Excluir questionário
 export async function deleteQuestionnaire(id: string) {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -245,18 +256,17 @@ export async function deleteQuestionnaire(id: string) {
   }
 
   await db
-    .update(doctorQuestionnairesTable)
+    .update(questionnairesTable)
     .set({
       isActive: false,
       updatedAt: new Date(),
     })
-    .where(eq(doctorQuestionnairesTable.id, id));
+    .where(eq(questionnairesTable.id, id));
 
   revalidatePath("/my-questionnaires");
   return { success: true };
 }
 
-// Buscar médicos para o select
 export async function getDoctorsForSelect() {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -274,7 +284,6 @@ export async function getDoctorsForSelect() {
   return doctors;
 }
 
-// Buscar templates para o select
 export async function getTemplatesForSelect() {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -292,11 +301,6 @@ export async function getTemplatesForSelect() {
   return templates;
 }
 
-// =============================================
-// NOVAS FUNÇÕES PARA MÉDICOS
-// =============================================
-
-// Buscar todos os médicos da clínica do usuário
 export async function getMyDoctors() {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -314,7 +318,6 @@ export async function getMyDoctors() {
   return doctors;
 }
 
-// Buscar o médico atual baseado no usuário logado
 export async function getCurrentDoctor() {
   const session = await auth.api.getSession({
     headers: await headers(),

@@ -12,11 +12,9 @@ import {
   PageHeaderContent,
   PageTitle,
 } from "@/components/ui/page-container";
-import AddAppointmentButton from "../appointments/_components/add-appointment-button";
 import { DataTable } from "@/components/ui/data-table";
 import { attendanceTableColumns } from "./_components/table-columns";
 import { db } from "@/db";
-import AddWalkInAttendanceForm from "./_components/add-attendance-form";
 import AddAttendanceButton from "./_components/add-attendence-button";
 import { doctorsTable, patientsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";

@@ -11,7 +11,7 @@ import {
   PageTitle,
 } from "@/components/ui/page-container";
 import { db } from "@/db";
-import { questionFieldsCatalogTable } from "@/db/schema";
+import { questionnaireFieldsTable } from "@/db/schema";
 import WithAuthentication from "@/hocs/with-authentication";
 import { auth } from "@/lib/auth";
 import { eq } from "drizzle-orm";
@@ -25,8 +25,8 @@ const QuestionFieldsPage = async () => {
   });
 
   // Buscar campos ativos
-  const fields = await db.query.questionFieldsCatalogTable.findMany({
-    where: eq(questionFieldsCatalogTable.isActive, true),
+  const fields = await db.query.questionnaireFieldsTable.findMany({
+    where: eq(questionnaireFieldsTable.isActive, true),
     orderBy: (fields, { asc }) => [asc(fields.category), asc(fields.order)],
   });
 

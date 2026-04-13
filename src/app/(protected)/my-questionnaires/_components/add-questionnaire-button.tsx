@@ -33,7 +33,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { createDoctorQuestionnaire } from "@/actions/my-questionnaires";
+import { createQuestionnaire } from "@/actions/my-questionnaires";
 
 const formSchema = z.object({
   doctorId: z.string().min(1, "Selecione um médico"),
@@ -66,7 +66,7 @@ export default function AddQuestionnaireButton({
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
-      await createDoctorQuestionnaire(data);
+      await createQuestionnaire(data);
       toast.success("Questionário criado com sucesso");
       setIsOpen(false);
       form.reset();

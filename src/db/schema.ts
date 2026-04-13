@@ -1,4 +1,3 @@
-// db/schema/index.ts
 import { relations } from "drizzle-orm";
 import {
   boolean,
@@ -64,7 +63,7 @@ export const userRoleEnum = pgEnum("user_role", [
 ]);
 
 // =============================================
-// TABELAS BASE
+// USUÁRIOS E AUTENTICAÇÃO
 // =============================================
 
 export const usersTable = pgTable(
@@ -81,9 +80,9 @@ export const usersTable = pgTable(
     createdAt: timestamp("created_at").notNull(),
     updatedAt: timestamp("updated_at").notNull(),
   },
-  (table) => ({
-    emailIdx: index("idx_users_email").on(table.email),
-  }),
+  (table) => [
+    index("idx_users_email").on(table.email),
+  ],
 );
 
 export const sessionsTable = pgTable(
@@ -100,10 +99,10 @@ export const sessionsTable = pgTable(
       .notNull()
       .references(() => usersTable.id, { onDelete: "cascade" }),
   },
-  (table) => ({
-    userIdIdx: index("idx_sessions_user_id").on(table.userId),
-    tokenIdx: index("idx_sessions_token").on(table.token),
-  }),
+  (table) => [
+    index("idx_sessions_user_id").on(table.userId),
+    index("idx_sessions_token").on(table.token),
+  ],
 );
 
 export const accountsTable = pgTable(
@@ -125,9 +124,9 @@ export const accountsTable = pgTable(
     createdAt: timestamp("created_at").notNull(),
     updatedAt: timestamp("updated_at").notNull(),
   },
-  (table) => ({
-    userIdIdx: index("idx_accounts_user_id").on(table.userId),
-  }),
+  (table) => [
+    index("idx_accounts_user_id").on(table.userId),
+  ],
 );
 
 export const verificationsTable = pgTable(
@@ -140,10 +139,14 @@ export const verificationsTable = pgTable(
     createdAt: timestamp("created_at"),
     updatedAt: timestamp("updated_at"),
   },
-  (table) => ({
-    identifierIdx: index("idx_verifications_identifier").on(table.identifier),
-  }),
+  (table) => [
+    index("idx_verifications_identifier").on(table.identifier),
+  ],
 );
+
+// =============================================
+// CLÍNICAS E USUÁRIOS
+// =============================================
 
 export const clinicsTable = pgTable(
   "clinics",
@@ -159,9 +162,9 @@ export const clinicsTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    nameIdx: index("idx_clinics_name").on(table.name),
-  }),
+  (table) => [
+    index("idx_clinics_name").on(table.name),
+  ],
 );
 
 export const usersToClinicsTable = pgTable(
@@ -179,15 +182,19 @@ export const usersToClinicsTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    userIdIdx: index("idx_users_to_clinics_user_id").on(table.userId),
-    clinicIdIdx: index("idx_users_to_clinics_clinic_id").on(table.clinicId),
-    userClinicUniqueIdx: index("idx_users_to_clinics_unique").on(
+  (table) => [
+    index("idx_users_to_clinics_user_id").on(table.userId),
+    index("idx_users_to_clinics_clinic_id").on(table.clinicId),
+    index("idx_users_to_clinics_unique").on(
       table.userId,
       table.clinicId,
     ),
-  }),
+  ],
 );
+
+// =============================================
+// MÉDICOS E PACIENTES
+// =============================================
 
 export const doctorsTable = pgTable(
   "doctors",
@@ -214,11 +221,11 @@ export const doctorsTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    clinicIdIdx: index("idx_doctors_clinic_id").on(table.clinicId),
-    userIdIdx: index("idx_doctors_user_id").on(table.userId),
-    specialtyIdx: index("idx_doctors_specialty").on(table.specialty),
-  }),
+  (table) => [
+    index("idx_doctors_clinic_id").on(table.clinicId),
+    index("idx_doctors_user_id").on(table.userId),
+    index("idx_doctors_specialty").on(table.specialty),
+  ],
 );
 
 export const patientsTable = pgTable(
@@ -247,12 +254,16 @@ export const patientsTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    clinicIdIdx: index("idx_patients_clinic_id").on(table.clinicId),
-    nameIdx: index("idx_patients_name").on(table.name),
-    cpfIdx: index("idx_patients_cpf").on(table.cpf),
-  }),
+  (table) => [
+    index("idx_patients_clinic_id").on(table.clinicId),
+    index("idx_patients_name").on(table.name),
+    index("idx_patients_cpf").on(table.cpf),
+  ],
 );
+
+// =============================================
+// AGENDAMENTOS E ATENDIMENTOS
+// =============================================
 
 export const appointmentsTable = pgTable(
   "appointments",
@@ -276,11 +287,11 @@ export const appointmentsTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    dateIdx: index("idx_appointments_date").on(table.date),
-    doctorIdIdx: index("idx_appointments_doctor_id").on(table.doctorId),
-    patientIdIdx: index("idx_appointments_patient_id").on(table.patientId),
-  }),
+  (table) => [
+    index("idx_appointments_date").on(table.date),
+    index("idx_appointments_doctor_id").on(table.doctorId),
+    index("idx_appointments_patient_id").on(table.patientId),
+  ],
 );
 
 export const attendancesTable = pgTable(
@@ -309,21 +320,23 @@ export const attendancesTable = pgTable(
     actualEndTime: timestamp("actual_end_time"),
     chiefComplaint: text("chief_complaint"),
     notes: text("notes"),
+    currentStep: integer("current_step").default(0),
+    progressData: json("progress_data"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    clinicIdIdx: index("idx_attendances_clinic_id").on(table.clinicId),
-    patientIdIdx: index("idx_attendances_patient_id").on(table.patientId),
-    doctorIdIdx: index("idx_attendances_doctor_id").on(table.doctorId),
-    statusIdx: index("idx_attendances_status").on(table.status),
-  }),
+  (table) => [
+    index("idx_attendances_clinic_id").on(table.clinicId),
+    index("idx_attendances_patient_id").on(table.patientId),
+    index("idx_attendances_doctor_id").on(table.doctorId),
+    index("idx_attendances_status").on(table.status),
+  ],
 );
 
 // =============================================
-// TABELAS ESTRUTURADAS
+// ATENDIMENTO ESTRUTURADO
 // =============================================
 
 export const vitalSignsTable = pgTable(
@@ -352,11 +365,11 @@ export const vitalSignsTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    attendanceIdIdx: index("idx_vital_signs_attendance_id").on(
+  (table) => [
+    index("idx_vital_signs_attendance_id").on(
       table.attendanceId,
     ),
-  }),
+  ],
 );
 
 export const prescriptionsTable = pgTable(
@@ -377,11 +390,11 @@ export const prescriptionsTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    attendanceIdIdx: index("idx_prescriptions_attendance_id").on(
+  (table) => [
+    index("idx_prescriptions_attendance_id").on(
       table.attendanceId,
     ),
-  }),
+  ],
 );
 
 export const medicalCertificatesTable = pgTable(
@@ -403,11 +416,11 @@ export const medicalCertificatesTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    attendanceIdIdx: index("idx_medical_certificates_attendance_id").on(
+  (table) => [
+    index("idx_medical_certificates_attendance_id").on(
       table.attendanceId,
     ),
-  }),
+  ],
 );
 
 export const physicalExamsTable = pgTable(
@@ -434,19 +447,19 @@ export const physicalExamsTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    attendanceIdIdx: index("idx_physical_exams_attendance_id").on(
+  (table) => [
+    index("idx_physical_exams_attendance_id").on(
       table.attendanceId,
     ),
-  }),
+  ],
 );
 
 // =============================================
 // SISTEMA DE QUESTIONÁRIOS
 // =============================================
 
-export const questionFieldsCatalogTable = pgTable(
-  "question_fields_catalog",
+export const questionnaireFieldsTable = pgTable(
+  "questionnaire_fields",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     name: text("name").notNull(),
@@ -469,10 +482,10 @@ export const questionFieldsCatalogTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    categoryIdx: index("idx_question_fields_category").on(table.category),
-    fieldKeyIdx: index("idx_question_fields_field_key").on(table.fieldKey),
-  }),
+  (table) => [
+    index("idx_questionnaire_fields_category").on(table.category),
+    index("idx_questionnaire_fields_key").on(table.fieldKey),
+  ],
 );
 
 export const questionnaireTemplatesTable = pgTable(
@@ -486,9 +499,6 @@ export const questionnaireTemplatesTable = pgTable(
     clinicId: uuid("clinic_id").references(() => clinicsTable.id, {
       onDelete: "cascade",
     }),
-    doctorId: uuid("doctor_id").references(() => doctorsTable.id, {
-      onDelete: "cascade",
-    }),
     isActive: boolean("is_active").default(true),
     isSystem: boolean("is_system").default(false),
     usageCount: integer("usage_count").default(0),
@@ -499,14 +509,14 @@ export const questionnaireTemplatesTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    categoryIdx: index("idx_questionnaire_templates_category").on(
+  (table) => [
+    index("idx_questionnaire_templates_category").on(
       table.category,
     ),
-    clinicIdIdx: index("idx_questionnaire_templates_clinic_id").on(
+    index("idx_questionnaire_templates_clinic_id").on(
       table.clinicId,
     ),
-  }),
+  ],
 );
 
 export const questionnaireTemplateFieldsTable = pgTable(
@@ -520,7 +530,7 @@ export const questionnaireTemplateFieldsTable = pgTable(
       }),
     fieldId: uuid("field_id")
       .notNull()
-      .references(() => questionFieldsCatalogTable.id, { onDelete: "cascade" }),
+      .references(() => questionnaireFieldsTable.id, { onDelete: "cascade" }),
     isRequired: boolean("is_required").default(false),
     order: integer("order").default(0),
     customLabel: text("custom_label"),
@@ -529,15 +539,15 @@ export const questionnaireTemplateFieldsTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    templateIdIdx: index("idx_template_fields_template_id").on(
+  (table) => [
+    index("idx_questionnaire_template_fields_template_id").on(
       table.templateId,
     ),
-  }),
+  ],
 );
 
-export const doctorQuestionnairesTable = pgTable(
-  "doctor_questionnaires",
+export const questionnairesTable = pgTable(
+  "questionnaires",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     doctorId: uuid("doctor_id")
@@ -556,11 +566,9 @@ export const doctorQuestionnairesTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    doctorIdIdx: index("idx_doctor_questionnaires_doctor_id").on(
-      table.doctorId,
-    ),
-  }),
+  (table) => [
+    index("idx_questionnaires_doctor_id").on(table.doctorId),
+  ],
 );
 
 export const questionnaireResponsesTable = pgTable(
@@ -570,8 +578,8 @@ export const questionnaireResponsesTable = pgTable(
     attendanceId: uuid("attendance_id")
       .notNull()
       .references(() => attendancesTable.id, { onDelete: "cascade" }),
-    doctorQuestionnaireId: uuid("doctor_questionnaire_id").references(
-      () => doctorQuestionnairesTable.id,
+    questionnaireId: uuid("questionnaire_id").references(
+      () => questionnairesTable.id,
     ),
     answeredBy: text("answered_by").notNull(),
     answeredById: uuid("answered_by_id"),
@@ -582,11 +590,14 @@ export const questionnaireResponsesTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    attendanceIdIdx: index("idx_questionnaire_responses_attendance_id").on(
+  (table) => [
+    index("idx_questionnaire_responses_attendance_id").on(
       table.attendanceId,
     ),
-  }),
+    index("idx_questionnaire_responses_questionnaire_id").on(
+      table.questionnaireId,
+    ),
+  ],
 );
 
 // =============================================
@@ -606,9 +617,9 @@ export const rolePermissionsTable = pgTable(
     role: userRoleEnum("role").notNull(),
     permissionId: uuid("permission_id").references(() => permissionsTable.id),
   },
-  (table) => ({
-    roleIdx: index("idx_role_permissions_role").on(table.role),
-  }),
+  (table) => [
+    index("idx_role_permissions_role").on(table.role),
+  ],
 );
 
 // =============================================
@@ -656,7 +667,7 @@ export const doctorsTableRelations = relations(
     }),
     appointments: many(appointmentsTable),
     attendances: many(attendancesTable),
-    doctorQuestionnaires: many(doctorQuestionnairesTable),
+    questionnaires: many(questionnairesTable),
   }),
 );
 
@@ -761,8 +772,8 @@ export const physicalExamsTableRelations = relations(
   }),
 );
 
-export const questionFieldsCatalogTableRelations = relations(
-  questionFieldsCatalogTable,
+export const questionnaireFieldsTableRelations = relations(
+  questionnaireFieldsTable,
   ({ many }) => ({
     templateFields: many(questionnaireTemplateFieldsTable),
   }),
@@ -775,12 +786,8 @@ export const questionnaireTemplatesTableRelations = relations(
       fields: [questionnaireTemplatesTable.clinicId],
       references: [clinicsTable.id],
     }),
-    doctor: one(doctorsTable, {
-      fields: [questionnaireTemplatesTable.doctorId],
-      references: [doctorsTable.id],
-    }),
     templateFields: many(questionnaireTemplateFieldsTable),
-    doctorQuestionnaires: many(doctorQuestionnairesTable),
+    questionnaires: many(questionnairesTable),
   }),
 );
 
@@ -791,22 +798,22 @@ export const questionnaireTemplateFieldsTableRelations = relations(
       fields: [questionnaireTemplateFieldsTable.templateId],
       references: [questionnaireTemplatesTable.id],
     }),
-    field: one(questionFieldsCatalogTable, {
+    field: one(questionnaireFieldsTable, {
       fields: [questionnaireTemplateFieldsTable.fieldId],
-      references: [questionFieldsCatalogTable.id],
+      references: [questionnaireFieldsTable.id],
     }),
   }),
 );
 
-export const doctorQuestionnairesTableRelations = relations(
-  doctorQuestionnairesTable,
+export const questionnairesTableRelations = relations(
+  questionnairesTable,
   ({ one, many }) => ({
     doctor: one(doctorsTable, {
-      fields: [doctorQuestionnairesTable.doctorId],
+      fields: [questionnairesTable.doctorId],
       references: [doctorsTable.id],
     }),
     template: one(questionnaireTemplatesTable, {
-      fields: [doctorQuestionnairesTable.templateId],
+      fields: [questionnairesTable.templateId],
       references: [questionnaireTemplatesTable.id],
     }),
     responses: many(questionnaireResponsesTable),
@@ -820,9 +827,9 @@ export const questionnaireResponsesTableRelations = relations(
       fields: [questionnaireResponsesTable.attendanceId],
       references: [attendancesTable.id],
     }),
-    doctorQuestionnaire: one(doctorQuestionnairesTable, {
-      fields: [questionnaireResponsesTable.doctorQuestionnaireId],
-      references: [doctorQuestionnairesTable.id],
+    questionnaire: one(questionnairesTable, {
+      fields: [questionnaireResponsesTable.questionnaireId],
+      references: [questionnairesTable.id],
     }),
   }),
 );
