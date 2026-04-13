@@ -23,8 +23,8 @@ export default async function AttendancesPage() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-  if (!session) {
-    redirect("/login");
+  if (!session?.user?.clinic) {
+    redirect("/clinic-form");
   }
 
   const [attendances, patients, doctors] = await Promise.all([

@@ -36,6 +36,9 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
+  if (!session?.user?.clinic) {
+    redirect("/clinic-form");
+  }
   const { from, to } = await searchParams;
   if (!from || !to) {
     redirect(

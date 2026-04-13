@@ -23,6 +23,9 @@ const AppointmentsPage = async () => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
+  if (!session?.user?.clinic) {
+    redirect("/clinic-form");
+  }
   const [patients, doctors, appointments] = await Promise.all([
     db.query.patientsTable.findMany({
       where: eq(patientsTable.clinicId, session!.user.clinic!.id),

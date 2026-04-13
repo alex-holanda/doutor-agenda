@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 import {
   PageActions,
@@ -22,6 +23,9 @@ const DoctorsPage = async () => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
+  if (!session?.user?.clinic) {
+    redirect("/clinic-form");
+  }
   const doctors = await db.query.doctorsTable.findMany({
     where: eq(doctorsTable.clinicId, session!.user.clinic!.id),
   });
