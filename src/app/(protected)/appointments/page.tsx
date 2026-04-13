@@ -18,6 +18,7 @@ import { auth } from "@/lib/auth";
 
 import AddAppointmentButton from "./_components/add-appointment-button";
 import { appointmentsTableColumns } from "./_components/table-columns";
+import { redirect } from "next/navigation";
 
 const AppointmentsPage = async () => {
   const session = await auth.api.getSession({
