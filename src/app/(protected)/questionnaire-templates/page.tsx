@@ -1,5 +1,6 @@
 // src/app/(protected)/questionnaire-templates/page.tsx
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 import {
   PageActions,
@@ -21,6 +22,9 @@ const QuestionnaireTemplatesPage = async () => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
+  if (!session?.user?.clinic) {
+    redirect("/clinic-form");
+  }
 
   const templates = await getQuestionnaireTemplates();
 

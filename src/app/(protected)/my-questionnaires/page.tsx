@@ -1,5 +1,6 @@
 // src/app/(protected)/my-questionnaires/page.tsx
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 import {
   PageActions,
@@ -31,6 +32,9 @@ const MyQuestionnairesPage = async ({ searchParams }: PageProps) => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
+  if (!session?.user?.clinic) {
+    redirect("/clinic-form");
+  }
 
   const { search, doctorId } = await searchParams;
 
