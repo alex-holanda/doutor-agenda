@@ -16,7 +16,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { attendanceTableColumns } from "./_components/table-columns";
 import { db } from "@/db";
 import AddAttendanceButton from "./_components/add-attendence-button";
-import { doctorsTable, patientsTable } from "@/db/schema";
+import { attendancesTable, doctorsTable, patientsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export default async function AttendancesPage() {
@@ -29,6 +29,7 @@ export default async function AttendancesPage() {
 
   const [attendances, patients, doctors] = await Promise.all([
     db.query.attendancesTable.findMany({
+      where: eq(attendancesTable.clinicId, session!.user.clinic!.id),
       with: {
         doctor: {
           columns: {
