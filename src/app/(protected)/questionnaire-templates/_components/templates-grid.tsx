@@ -71,22 +71,6 @@ interface TemplatesGridProps {
   templates: any[];
 }
 
-const iconMap: Record<string, any> = {
-  vital_signs: Heart,
-  anamnesis: FileText,
-  physical_exam: Activity,
-  prescription: Pill,
-  custom: FileText,
-};
-
-const colorMap: Record<string, string> = {
-  vital_signs: "bg-blue-100 text-blue-700",
-  anamnesis: "bg-green-100 text-green-700",
-  physical_exam: "bg-purple-100 text-purple-700",
-  prescription: "bg-orange-100 text-orange-700",
-  custom: "bg-gray-100 text-gray-700",
-};
-
 const categoryLabels: Record<string, string> = {
   vital_signs: "Sinais Vitais",
   anamnesis: "Anamnese",
@@ -122,9 +106,7 @@ export function TemplatesGrid({
     const matchesSearch =
       template.name.toLowerCase().includes(search.toLowerCase()) ||
       template.description?.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory =
-      categoryFilter === "all" || template.category === categoryFilter;
-    return matchesSearch && matchesCategory;
+    return matchesSearch;
   });
 
   const handleDuplicate = async (id: string) => {
@@ -217,15 +199,12 @@ export function TemplatesGrid({
           </div>
         ) : (
           filteredTemplates.map((template) => {
-            const Icon = iconMap[template.category] || FileText;
-            const colorClass = colorMap[template.category] || colorMap.custom;
-
             return (
               <Card key={template.id} className="relative">
                 <CardHeader>
                   <div className="flex items-start justify-between">
-                    <div className={`rounded-lg p-2 ${colorClass}`}>
-                      <Icon className="h-5 w-5" />
+                    <div className="bg-primary/10 rounded-lg p-2">
+                      <FileText className="text-primary h-5 w-5" />
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger>
@@ -234,22 +213,33 @@ export function TemplatesGrid({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onSelect={() => setPreviewTemplate(template)}>
+                        <DropdownMenuItem
+                          onSelect={() => setPreviewTemplate(template)}
+                        >
                           <Eye className="mr-2 h-4 w-4" />
                           Visualizar
                         </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => handleDuplicate(template.id)}>
+                        <DropdownMenuItem
+                          onSelect={() => handleDuplicate(template.id)}
+                        >
                           <Copy className="mr-2 h-4 w-4" />
                           Duplicar
                         </DropdownMenuItem>
                         {!template.isSystem && (
                           <>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onSelect={() => handleEdit(template)}>
+                            <DropdownMenuItem
+                              onSelect={() => handleEdit(template)}
+                            >
                               <FileEdit className="mr-2 h-4 w-4" />
                               Editar
                             </DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => handleDelete(template.id, template.isSystem)} className="text-red-600">
+                            <DropdownMenuItem
+                              onSelect={() =>
+                                handleDelete(template.id, template.isSystem)
+                              }
+                              className="text-red-600"
+                            >
                               <Trash2 className="mr-2 h-4 w-4" />
                               Excluir
                             </DropdownMenuItem>
@@ -314,9 +304,7 @@ export function TemplatesGrid({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Editar Template</DialogTitle>
-            <DialogDescription>
-              Altere os dados do template
-            </DialogDescription>
+            <DialogDescription>Altere os dados do template</DialogDescription>
           </DialogHeader>
           <Form {...editForm}>
             <form

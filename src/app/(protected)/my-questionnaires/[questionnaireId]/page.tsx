@@ -28,9 +28,7 @@ interface PageProps {
   }>;
 }
 
-export default async function QuestionnaireDetailPage({
-  params,
-}: PageProps) {
+export default async function QuestionnaireDetailPage({ params }: PageProps) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -89,13 +87,9 @@ export default async function QuestionnaireDetailPage({
                     </p>
                   </div>
                   <div>
-                    <Label className="text-muted-foreground">Categoria</Label>
-                    <Badge variant="outline">
-                      {questionnaire.template?.category || "Personalizado"}
-                    </Badge>
-                  </div>
-                  <div>
-                    <Label className="text-muted-foreground">Quantidade de Campos</Label>
+                    <Label className="text-muted-foreground">
+                      Quantidade de Campos
+                    </Label>
                     <p className="font-medium">
                       {questionnaire.template?.fields?.length || 0}
                     </p>
@@ -110,58 +104,65 @@ export default async function QuestionnaireDetailPage({
                 <CardTitle>Campos do Questionário</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {questionnaire.template?.fields && questionnaire.template.fields.length > 0 ? (
-                  questionnaire.template.fields.map((field: any, index: number) => (
-                    <div key={field.id || index} className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <Label>
-                          {field.label || field.name || field.fieldKey}
-                          {field.isRequired && <span className="ml-1 text-red-500">*</span>}
-                        </Label>
-                        <Badge variant="secondary" className="text-xs">
-                          {field.fieldType}
-                        </Badge>
+                {questionnaire.template?.fields &&
+                questionnaire.template.fields.length > 0 ? (
+                  questionnaire.template.fields.map(
+                    (field: any, index: number) => (
+                      <div key={field.id || index} className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <Label>
+                            {field.label || field.name || field.fieldKey}
+                            {field.isRequired && (
+                              <span className="ml-1 text-red-500">*</span>
+                            )}
+                          </Label>
+                          <Badge variant="secondary" className="text-xs">
+                            {field.fieldType}
+                          </Badge>
+                        </div>
+                        {field.fieldType === "textarea" ? (
+                          <Textarea
+                            disabled
+                            placeholder={
+                              field.placeholder || "Campo de texto longo"
+                            }
+                            rows={3}
+                          />
+                        ) : field.fieldType === "select" ||
+                          field.fieldType === "radio" ? (
+                          <Textarea
+                            disabled
+                            placeholder={
+                              field.options?.join(", ") ||
+                              "Opções: " + (field.options?.length || 0)
+                            }
+                            rows={2}
+                          />
+                        ) : field.fieldType === "boolean" ? (
+                          <Input disabled placeholder="Sim / Não" />
+                        ) : field.fieldType === "number" ||
+                          field.fieldType === "scale" ? (
+                          <Input
+                            disabled
+                            type="number"
+                            placeholder={field.placeholder || "Campo numérico"}
+                          />
+                        ) : (
+                          <Input
+                            disabled
+                            placeholder={field.placeholder || "Campo de texto"}
+                          />
+                        )}
+                        {field.helpText && (
+                          <p className="text-muted-foreground text-xs">
+                            {field.helpText}
+                          </p>
+                        )}
                       </div>
-                      {field.fieldType === "textarea" ? (
-                        <Textarea
-                          disabled
-                          placeholder={field.placeholder || "Campo de texto longo"}
-                          rows={3}
-                        />
-                      ) : field.fieldType === "select" || field.fieldType === "radio" ? (
-                        <Textarea
-                          disabled
-                          placeholder={
-                            field.options?.join(", ") || "Opções: " + (field.options?.length || 0)
-                          }
-                          rows={2}
-                        />
-                      ) : field.fieldType === "boolean" ? (
-                        <Input
-                          disabled
-                          placeholder="Sim / Não"
-                        />
-                      ) : field.fieldType === "number" || field.fieldType === "scale" ? (
-                        <Input
-                          disabled
-                          type="number"
-                          placeholder={field.placeholder || "Campo numérico"}
-                        />
-                      ) : (
-                        <Input
-                          disabled
-                          placeholder={field.placeholder || "Campo de texto"}
-                        />
-                      )}
-                      {field.helpText && (
-                        <p className="text-muted-foreground text-xs">
-                          {field.helpText}
-                        </p>
-                      )}
-                    </div>
-                  ))
+                    ),
+                  )
                 ) : (
-                  <p className="text-muted-foreground text-center py-4">
+                  <p className="text-muted-foreground py-4 text-center">
                     Nenhum campo encontrado neste questionário
                   </p>
                 )}

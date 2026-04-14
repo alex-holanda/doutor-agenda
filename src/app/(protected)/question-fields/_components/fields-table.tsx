@@ -140,7 +140,6 @@ export function FieldsTable({ fields: initialFields }: FieldsTableProps) {
               <TableHead>Nome</TableHead>
               <TableHead>Field Key</TableHead>
               <TableHead>Tipo</TableHead>
-              <TableHead>Categoria</TableHead>
               <TableHead>Obrigatório</TableHead>
               <TableHead>Unidade</TableHead>
               <TableHead className="text-right">Ações</TableHead>
@@ -166,11 +165,6 @@ export function FieldsTable({ fields: initialFields }: FieldsTableProps) {
                   <TableCell>
                     <Badge variant="outline">
                       {typeLabels[field.fieldType] || field.fieldType}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">
-                      {categoryLabels[field.category] || field.category}
                     </Badge>
                   </TableCell>
                   <TableCell>

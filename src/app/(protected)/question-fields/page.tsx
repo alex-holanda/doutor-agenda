@@ -27,7 +27,7 @@ const QuestionFieldsPage = async () => {
   // Buscar campos ativos
   const fields = await db.query.questionnaireFieldsTable.findMany({
     where: eq(questionnaireFieldsTable.isActive, true),
-    orderBy: (fields, { asc }) => [asc(fields.category), asc(fields.order)],
+    orderBy: (fields, { asc }) => [asc(fields.order)],
   });
 
   return (

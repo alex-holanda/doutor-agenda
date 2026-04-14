@@ -31,9 +31,7 @@ import { X } from "lucide-react";
 // Schema simplificado igual ao questionnaire-form
 const formSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
-  fieldKey: z.string().min(1, "Field key é obrigatório"),
   fieldType: z.string().min(1, "Tipo é obrigatório"),
-  category: z.string().min(1, "Categoria é obrigatória"),
   description: z.string().optional(),
   unit: z.string().optional(),
   minValue: z.any().optional(),
@@ -63,14 +61,6 @@ const fieldTypes = [
   { value: "scale", label: "Escala" },
 ];
 
-const categories = [
-  { value: "vital_signs", label: "Sinais Vitais" },
-  { value: "anamnesis", label: "Anamnese" },
-  { value: "physical_exam", label: "Exame Físico" },
-  { value: "prescription", label: "Prescrição" },
-  { value: "custom", label: "Personalizado" },
-];
-
 export function FieldForm({
   initialData,
   onSubmit,
@@ -83,9 +73,7 @@ export function FieldForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: initialData?.name || "",
-      fieldKey: initialData?.fieldKey || "",
       fieldType: initialData?.fieldType || "text",
-      category: initialData?.category || "",
       description: initialData?.description || "",
       unit: initialData?.unit || "",
       minValue: initialData?.minValue || "",
@@ -140,24 +128,6 @@ export function FieldForm({
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="fieldKey"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Field Key *</FormLabel>
-              <FormControl>
-                <Input placeholder="Ex: blood_pressure" {...field} />
-              </FormControl>
-              <FormDescription>
-                Identificador único usado no código (apenas letras minúsculas e
-                underscore)
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -178,34 +148,6 @@ export function FieldForm({
                     {fieldTypes.map((type) => (
                       <SelectItem key={type.value} value={type.value}>
                         {type.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="category"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Categoria *</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat.value} value={cat.value}>
-                        {cat.label}
                       </SelectItem>
                     ))}
                   </SelectContent>

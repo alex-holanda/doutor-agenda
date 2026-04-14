@@ -3,16 +3,26 @@
 
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@/db";
 import { questionnaireFieldsTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
 
+function generateFieldKey(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[*()\/^~´´\`\`\[\]]/g, "")
+    .replace(/\s+/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_|_$/g, "");
+}
+
 const fieldSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
-  fieldKey: z.string().min(1, "Field key é obrigatório"),
   fieldType: z.enum([
     "text",
     "textarea",
@@ -26,7 +36,6 @@ const fieldSchema = z.object({
     "boolean",
     "scale",
   ]),
-  category: z.string().min(1, "Categoria é obrigatória"),
   description: z.string().optional(),
   unit: z.string().optional(),
   minValue: z.number().optional().nullable(),
@@ -49,7 +58,7 @@ export async function getQuestionFields() {
 
   const fields = await db.query.questionnaireFieldsTable.findMany({
     where: eq(questionnaireFieldsTable.isActive, true),
-    orderBy: (fields, { asc }) => [asc(fields.category), asc(fields.order)],
+    orderBy: (fields, { asc }) => [asc(fields.order)],
   });
 
   return fields;
@@ -67,17 +76,37 @@ export async function createQuestionField(data: z.infer<typeof fieldSchema>) {
 
   const validated = fieldSchema.parse(data);
 
+  // Gerar fieldKey automaticamente a partir do nome
+  const fieldKey = generateFieldKey(validated.name);
+
   // Verificar se field key já existe
-  const existing = await db.query.questionnaireFieldsTable.findFirst({
-    where: eq(questionnaireFieldsTable.fieldKey, validated.fieldKey),
+  let existing = await db.query.questionnaireFieldsTable.findFirst({
+    where: eq(questionnaireFieldsTable.fieldKey, fieldKey),
   });
 
-  if (existing) {
-    throw new Error("Field key já existe");
+  // Se já existir, adicionar sufixo numérico
+  let finalFieldKey = fieldKey;
+  let counter = 1;
+  while (existing) {
+    finalFieldKey = `${fieldKey}_${counter}`;
+    existing = await db.query.questionnaireFieldsTable.findFirst({
+      where: eq(questionnaireFieldsTable.fieldKey, finalFieldKey),
+    });
+    counter++;
   }
 
   await db.insert(questionnaireFieldsTable).values({
-    ...validated,
+    name: validated.name,
+    fieldKey: finalFieldKey,
+    fieldType: validated.fieldType,
+    description: validated.description,
+    unit: validated.unit,
+    minValue: validated.minValue,
+    maxValue: validated.maxValue,
+    options: validated.options,
+    placeholder: validated.placeholder,
+    helpText: validated.helpText,
+    isRequired: validated.isRequired,
     isSystem: false,
     isActive: true,
     order: 0,

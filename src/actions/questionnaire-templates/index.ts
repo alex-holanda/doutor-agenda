@@ -17,8 +17,6 @@ import { auth } from "@/lib/auth";
 const templateSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   description: z.string().optional(),
-  category: z.string().min(1, "Categoria é obrigatória"),
-  categoryType: z.enum(["system", "clinic", "personal"]).default("personal"),
   fieldIds: z.array(z.string()).min(1, "Selecione pelo menos um campo"),
 });
 
@@ -34,10 +32,7 @@ export async function getQuestionnaireTemplates() {
 
   const templates = await db.query.questionnaireTemplatesTable.findMany({
     where: eq(questionnaireTemplatesTable.isActive, true),
-    orderBy: [
-      desc(questionnaireTemplatesTable.isSystem),
-      asc(questionnaireTemplatesTable.name),
-    ],
+    orderBy: [asc(questionnaireTemplatesTable.name)],
   });
 
   // Buscar campos para cada template
@@ -83,10 +78,7 @@ export async function createQuestionnaireTemplate(
     .values({
       name: validated.name,
       description: validated.description,
-      category: validated.category,
-      categoryType: validated.categoryType,
       clinicId: session.user.clinic.id,
-      isSystem: false,
       isActive: true,
       version: 1,
     })
@@ -123,8 +115,8 @@ export async function updateQuestionnaireTemplate(
     where: eq(questionnaireTemplatesTable.id, id),
   });
 
-  if (template?.isSystem) {
-    throw new Error("Templates do sistema não podem ser editados");
+  if (!template) {
+    throw new Error("Template não encontrado");
   }
 
   await db
@@ -171,8 +163,8 @@ export async function deleteQuestionnaireTemplate(id: string) {
     where: eq(questionnaireTemplatesTable.id, id),
   });
 
-  if (template?.isSystem) {
-    throw new Error("Templates do sistema não podem ser excluídos");
+  if (!template) {
+    throw new Error("Template não encontrado");
   }
 
   await db
@@ -216,10 +208,7 @@ export async function duplicateQuestionnaireTemplate(id: string) {
     .values({
       name: `${original.name} (Cópia)`,
       description: original.description,
-      category: original.category,
-      categoryType: "personal",
       clinicId: session.user.clinic.id,
-      isSystem: false,
       isActive: true,
       version: 1,
     })
