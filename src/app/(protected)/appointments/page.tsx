@@ -1,4 +1,4 @@
-import { eq, ne } from "drizzle-orm";
+import { and, eq, gte, lt, ne } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -38,6 +38,12 @@ const AppointmentsPage = async ({ searchParams }: AppointmentsPageProps) => {
 
   const { status } = await searchParams;
 
+  const startOfToday = new Date();
+  const startOfTomorrow = new Date(startOfToday);
+
+  startOfToday.setHours(0, 0, 0, 0);
+  startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
+
   const [patients, doctors, appointments] = await Promise.all([
     db.query.patientsTable.findMany({
       where: eq(patientsTable.clinicId, session!.user.clinic!.id),
@@ -46,7 +52,11 @@ const AppointmentsPage = async ({ searchParams }: AppointmentsPageProps) => {
       where: eq(doctorsTable.clinicId, session!.user.clinic!.id),
     }),
     db.query.appointmentsTable.findMany({
-      where: eq(appointmentsTable.clinicId, session!.user.clinic!.id),
+      where: and(
+        eq(appointmentsTable.clinicId, session!.user.clinic!.id),
+        gte(appointmentsTable.date, startOfToday),
+        lt(appointmentsTable.date, startOfTomorrow),
+      ),
       with: {
         patient: true,
         doctor: true,
