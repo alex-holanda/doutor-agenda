@@ -197,26 +197,32 @@ export function QuestionnairesList({
           <Card key={questionnaire.id} className="relative">
             <CardHeader>
               <div className="flex items-start justify-between">
-                <Badge variant="outline">
-                  {questionnaire.template?.category || "Personalizado"}
-                </Badge>
                 <DropdownMenu>
-                  <DropdownMenuTrigger>
+                  <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" type="button">
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onSelect={() => router.push(`/my-questionnaires/${questionnaire.id}`)}>
+                    <DropdownMenuItem
+                      onSelect={() =>
+                        router.push(`/my-questionnaires/${questionnaire.id}`)
+                      }
+                    >
                       <Eye className="mr-2 h-4 w-4" />
                       Visualizar
                     </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => handleEdit(questionnaire)}>
+                    <DropdownMenuItem
+                      onSelect={() => handleEdit(questionnaire)}
+                    >
                       <FileEdit className="mr-2 h-4 w-4" />
                       Editar
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onSelect={() => handleDelete(questionnaire.id)} className="text-red-600">
+                    <DropdownMenuItem
+                      onSelect={() => handleDelete(questionnaire.id)}
+                      className="text-red-600"
+                    >
                       <Trash2 className="mr-2 h-4 w-4" />
                       Excluir
                     </DropdownMenuItem>
@@ -281,9 +287,7 @@ export function QuestionnairesList({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Editar Questionário</DialogTitle>
-            <DialogDescription>
-              Altere o nome do questionário
-            </DialogDescription>
+            <DialogDescription>Altere o nome do questionário</DialogDescription>
           </DialogHeader>
           <Form {...editForm}>
             <form

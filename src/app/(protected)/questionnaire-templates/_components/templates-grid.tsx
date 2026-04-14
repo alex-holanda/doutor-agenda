@@ -71,14 +71,6 @@ interface TemplatesGridProps {
   templates: any[];
 }
 
-const categoryLabels: Record<string, string> = {
-  vital_signs: "Sinais Vitais",
-  anamnesis: "Anamnese",
-  physical_exam: "Exame Físico",
-  prescription: "Prescrição",
-  custom: "Personalizado",
-};
-
 const editFormSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   description: z.string().optional(),
@@ -89,7 +81,6 @@ export function TemplatesGrid({
 }: TemplatesGridProps) {
   const [templates, setTemplates] = useState(initialTemplates);
   const [search, setSearch] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
   const [previewTemplate, setPreviewTemplate] = useState<any>(null);
   const [editingTemplate, setEditingTemplate] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -176,19 +167,6 @@ export function TemplatesGrid({
             className="pl-9"
           />
         </div>
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Filtrar por categoria" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todas categorias</SelectItem>
-            <SelectItem value="vital_signs">Sinais Vitais</SelectItem>
-            <SelectItem value="anamnesis">Anamnese</SelectItem>
-            <SelectItem value="physical_exam">Exame Físico</SelectItem>
-            <SelectItem value="prescription">Prescrição</SelectItem>
-            <SelectItem value="custom">Personalizados</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
       {/* Grid */}
@@ -207,7 +185,7 @@ export function TemplatesGrid({
                       <FileText className="text-primary h-5 w-5" />
                     </div>
                     <DropdownMenu>
-                      <DropdownMenuTrigger>
+                      <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" type="button">
                           <MoreVertical className="h-4 w-4" />
                         </Button>
@@ -266,13 +244,6 @@ export function TemplatesGrid({
                       <span className="font-medium">
                         {template.usageCount || 0}
                       </span>
-                    </div>
-                    <div>
-                      <Badge
-                        variant={template.isSystem ? "default" : "secondary"}
-                      >
-                        {template.isSystem ? "Sistema" : "Personalizado"}
-                      </Badge>
                     </div>
                   </div>
                 </CardContent>

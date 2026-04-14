@@ -24,26 +24,12 @@ export function TemplatePreviewDialog({
 }: TemplatePreviewDialogProps) {
   if (!template) return null;
 
-  const categoryLabels: Record<string, string> = {
-    vital_signs: "Sinais Vitais",
-    anamnesis: "Anamnese",
-    physical_exam: "Exame Físico",
-    prescription: "Prescrição",
-    custom: "Personalizado",
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl">{template.name}</DialogTitle>
           <div className="mt-2 flex gap-2">
-            <Badge variant={template.isSystem ? "default" : "secondary"}>
-              {template.isSystem ? "Sistema" : "Personalizado"}
-            </Badge>
-            <Badge variant="outline">
-              {categoryLabels[template.category] || template.category}
-            </Badge>
             <Badge variant="outline">{template.fieldsCount} campos</Badge>
           </div>
         </DialogHeader>

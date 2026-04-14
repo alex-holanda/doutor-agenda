@@ -107,7 +107,6 @@ export async function createQuestionField(data: z.infer<typeof fieldSchema>) {
     placeholder: validated.placeholder,
     helpText: validated.helpText,
     isRequired: validated.isRequired,
-    isSystem: false,
     isActive: true,
     order: 0,
   });
@@ -155,10 +154,6 @@ export async function updateQuestionField(
   const existing = await db.query.questionnaireFieldsTable.findFirst({
     where: eq(questionnaireFieldsTable.id, id),
   });
-
-  if (existing?.isSystem) {
-    throw new Error("Campos do sistema não podem ser editados");
-  }
 
   // Regenerar fieldKey se o nome mudou
   let newFieldKey = existing?.fieldKey;
@@ -217,8 +212,8 @@ export async function deleteQuestionField(id: string) {
     where: eq(questionnaireFieldsTable.id, id),
   });
 
-  if (existing?.isSystem) {
-    throw new Error("Campos do sistema não podem ser excluídos");
+  if (!existing) {
+    throw new Error("Campo não encontrado");
   }
 
   await db

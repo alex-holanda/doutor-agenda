@@ -1,7 +1,7 @@
 // src/app/(protected)/questionnaire-templates/_components/template-form.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -18,13 +18,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { getQuestionFields } from "@/actions/question-fields";
@@ -32,8 +25,6 @@ import { getQuestionFields } from "@/actions/question-fields";
 const formSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   description: z.string().optional(),
-  category: z.string().min(1, "Categoria é obrigatória"),
-  categoryType: z.enum(["system", "clinic", "personal"]).default("personal"),
   fieldIds: z.array(z.string()).min(1, "Selecione pelo menos um campo"),
 });
 
@@ -43,23 +34,11 @@ interface TemplateFormProps {
   isLoading: boolean;
 }
 
-const categories = [
-  { value: "vital_signs", label: "Sinais Vitais" },
-  { value: "anamnesis", label: "Anamnese" },
-  { value: "physical_exam", label: "Exame Físico" },
-  { value: "prescription", label: "Prescrição" },
-  { value: "custom", label: "Personalizado" },
-];
-
 export function TemplateForm({
   initialData,
   onSubmit,
   isLoading,
 }: TemplateFormProps) {
-  const [selectedCategory, setSelectedCategory] = useState(
-    initialData?.category || "",
-  );
-
   const { data: fields = [] } = useQuery({
     queryKey: ["question-fields"],
     queryFn: () => getQuestionFields(),
@@ -70,19 +49,11 @@ export function TemplateForm({
     defaultValues: {
       name: initialData?.name || "",
       description: initialData?.description || "",
-      category: initialData?.category || "",
-      categoryType: initialData?.categoryType || "personal",
       fieldIds: initialData?.fields?.map((f: any) => f.id) || [],
     },
   });
 
   const selectedFieldIds = form.watch("fieldIds");
-  const category = form.watch("category");
-
-  // Filtrar campos pela categoria selecionada
-  const filteredFields = fields.filter(
-    (field: any) => category === "custom" || field.category === category,
-  );
 
   const handleFieldToggle = (fieldId: string) => {
     const current = form.getValues("fieldIds");
@@ -131,49 +102,16 @@ export function TemplateForm({
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="category"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Categoria *</FormLabel>
-              <Select
-                onValueChange={(value) => {
-                  field.onChange(value);
-                  form.setValue("fieldIds", []);
-                }}
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.value} value={cat.value}>
-                      {cat.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <div className="space-y-2">
           <FormLabel>Selecionar campos *</FormLabel>
           <div className="max-h-[400px] overflow-y-auto rounded-lg border p-4">
-            {filteredFields.length === 0 ? (
+            {fields.length === 0 ? (
               <p className="text-muted-foreground py-8 text-center">
-                {category
-                  ? "Nenhum campo disponível para esta categoria"
-                  : "Selecione uma categoria primeiro"}
+                Nenhum campo disponível
               </p>
             ) : (
               <div className="space-y-2">
-                {filteredFields.map((field: any) => (
+                {fields.map((field: any) => (
                   <div
                     key={field.id}
                     className="hover:bg-muted flex items-center justify-between rounded-lg p-2"

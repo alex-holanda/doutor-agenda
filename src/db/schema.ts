@@ -444,7 +444,6 @@ export const questionnaireFieldsTable = pgTable(
     helpText: text("help_text"),
     isRequired: boolean("is_required").default(false),
     isActive: boolean("is_active").default(true),
-    isSystem: boolean("is_system").default(false),
     order: integer("order").default(0),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
