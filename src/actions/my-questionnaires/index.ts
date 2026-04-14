@@ -138,10 +138,12 @@ export async function getMyQuestionnaires(search?: string, doctorId?: string) {
           orderBy: (fields, { asc }) => [asc(fields.order)],
         });
 
-      const lastResponse = await db.query.questionnaireResponsesTable.findFirst({
-        where: eq(questionnaireResponsesTable.questionnaireId, q.id),
-        orderBy: [desc(questionnaireResponsesTable.createdAt)],
-      });
+      const lastResponse = await db.query.questionnaireResponsesTable.findFirst(
+        {
+          where: eq(questionnaireResponsesTable.questionnaireId, q.id),
+          orderBy: [desc(questionnaireResponsesTable.createdAt)],
+        },
+      );
 
       return {
         ...q,
@@ -222,10 +224,7 @@ export async function getQuestionnaireById(id: string) {
   };
 }
 
-export async function updateQuestionnaire(
-  id: string,
-  data: { name: string },
-) {
+export async function updateQuestionnaire(id: string, data: { name: string }) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -332,4 +331,36 @@ export async function getCurrentDoctor() {
   });
 
   return doctor;
+}
+
+export async function reorderQuestionnaireFields(
+  questionnaireId: string,
+  fieldIds: string[],
+) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user?.id) {
+    throw new Error("Não autorizado");
+  }
+
+  const questionnaire = await db.query.questionnairesTable.findFirst({
+    where: eq(questionnairesTable.id, questionnaireId),
+  });
+
+  if (!questionnaire) {
+    throw new Error("Questionário não encontrado");
+  }
+
+  // Atualizar a ordem dos campos
+  for (let i = 0; i < fieldIds.length; i++) {
+    await db
+      .update(questionnaireTemplateFieldsTable)
+      .set({ order: i })
+      .where(eq(questionnaireTemplateFieldsTable.id, fieldIds[i]));
+  }
+
+  revalidatePath(`/my-questionnaires/${questionnaireId}`);
+  return { success: true };
 }
