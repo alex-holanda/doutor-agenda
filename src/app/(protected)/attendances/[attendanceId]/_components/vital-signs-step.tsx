@@ -59,10 +59,10 @@ export function VitalSignsStep({ initialData }: VitalSignsStepProps) {
         {/* Pressão Arterial */}
         <div className="space-y-3">
           <Label className="text-base font-semibold">Pressão Arterial</Label>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="bloodPressureSystolic">
-                Pressão Sistólica <span className="text-red-500">*</span>
+                Sistólica <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="bloodPressureSystolic"
@@ -75,7 +75,7 @@ export function VitalSignsStep({ initialData }: VitalSignsStepProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="bloodPressureDiastolic">
-                Pressão Diastólica <span className="text-red-500">*</span>
+                Diastólica <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="bloodPressureDiastolic"
@@ -92,10 +92,10 @@ export function VitalSignsStep({ initialData }: VitalSignsStepProps) {
         {/* Frequência Cardíaca e Respiratória */}
         <div className="space-y-3">
           <Label className="text-base font-semibold">Frequências</Label>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="heartRate">
-                Frequência Cardíaca <span className="text-red-500">*</span>
+                Cardíaca <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="heartRate"
@@ -107,7 +107,7 @@ export function VitalSignsStep({ initialData }: VitalSignsStepProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="respiratoryRate">Frequência Respiratória</Label>
+              <Label htmlFor="respiratoryRate">Respiratória</Label>
               <Input
                 id="respiratoryRate"
                 name="respiratoryRate"
@@ -122,7 +122,7 @@ export function VitalSignsStep({ initialData }: VitalSignsStepProps) {
         {/* Temperatura e Saturação */}
         <div className="space-y-3">
           <Label className="text-base font-semibold">Outros Sinais</Label>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="temperature">Temperatura</Label>
               <Input
@@ -136,7 +136,7 @@ export function VitalSignsStep({ initialData }: VitalSignsStepProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="oxygenSaturation">
-                Saturação de Oxigênio <span className="text-red-500">*</span>
+                Saturação <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="oxygenSaturation"
@@ -153,9 +153,9 @@ export function VitalSignsStep({ initialData }: VitalSignsStepProps) {
         {/* Glicemia */}
         <div className="space-y-3">
           <Label className="text-base font-semibold">Glicemia</Label>
-          <div className="grid max-w-xs grid-cols-1">
+          <div className="grid grid-cols-1 md:max-w-xs">
             <div className="space-y-2">
-              <Label htmlFor="bloodGlucose">Glicemia Capilar</Label>
+              <Label htmlFor="bloodGlucose">Capilar</Label>
               <Input
                 id="bloodGlucose"
                 name="bloodGlucose"
@@ -170,7 +170,7 @@ export function VitalSignsStep({ initialData }: VitalSignsStepProps) {
         {/* Antropometria */}
         <div className="space-y-3">
           <Label className="text-base font-semibold">Antropometria</Label>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="weight">Peso</Label>
               <Input
@@ -194,9 +194,9 @@ export function VitalSignsStep({ initialData }: VitalSignsStepProps) {
               />
             </div>
           </div>
-          <div className="grid max-w-xs grid-cols-1">
+          <div className="grid grid-cols-1 md:max-w-xs">
             <div className="space-y-2">
-              <Label htmlFor="bmi">IMC (calculado automaticamente)</Label>
+              <Label htmlFor="bmi">IMC</Label>
               <Input
                 id="bmi"
                 name="bmi"
