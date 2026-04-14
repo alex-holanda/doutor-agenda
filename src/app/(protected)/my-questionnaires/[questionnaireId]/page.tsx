@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth";
 import WithAuthentication from "@/hocs/with-authentication";
 import {
   PageContainer,
+  PageContent,
   PageDescription,
   PageHeader,
   PageHeaderContent,
@@ -15,7 +16,8 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getQuestionnaireById } from "@/actions/my-questionnaires";
-import { FieldsReorderList } from "./_components/fields-reorder-list";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface PageProps {
   params: Promise<{
@@ -47,6 +49,7 @@ export default async function QuestionnaireDetailPage({ params }: PageProps) {
       description: f.description,
       fieldKey: f.fieldKey,
       fieldType: f.fieldType,
+      unit: f.unit,
       order: f.order ?? index,
     }))
     .sort((a: any, b: any) => a.order - b.order);
@@ -57,11 +60,6 @@ export default async function QuestionnaireDetailPage({ params }: PageProps) {
         <PageHeader>
           <PageHeaderContent>
             <div className="flex items-center gap-2">
-              <Link href="/my-questionnaires">
-                <Button variant="ghost" size="icon">
-                  <ArrowLeft className="h-4 w-4" />
-                </Button>
-              </Link>
               <div>
                 <PageTitle>{questionnaire.name}</PageTitle>
                 <PageDescription>
@@ -72,7 +70,31 @@ export default async function QuestionnaireDetailPage({ params }: PageProps) {
           </PageHeaderContent>
         </PageHeader>
 
-        <FieldsReorderList questionnaireId={questionnaireId} fields={fields} />
+        <PageContent>
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Campos do Questionário</h3>
+            <div className="space-y-2">
+              {fields.map((field: any, index: number) => (
+                <Card key={field.id}>
+                  <CardContent>
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline">{index + 1}</Badge>
+                        <div>
+                          <p className="font-medium">{field.name}</p>
+                          <p className="text-muted-foreground text-xs">
+                            {field.fieldKey} • {field.fieldType}
+                            {field.unit && ` • ${field.unit}`}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </PageContent>
       </PageContainer>
     </WithAuthentication>
   );

@@ -11,7 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -197,6 +196,9 @@ export function QuestionnairesList({
           <Card key={questionnaire.id} className="relative">
             <CardHeader>
               <div className="flex items-start justify-between">
+                <div className="bg-primary/10 rounded-lg p-2">
+                  <FileText className="text-primary h-5 w-5" />
+                </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" type="button">

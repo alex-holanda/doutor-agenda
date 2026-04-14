@@ -60,21 +60,31 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { getQuestionFields } from "@/actions/question-fields";
+import { useQuery } from "@tanstack/react-query";
 
 interface TemplatesGridProps {
   templates: any[];
 }
 
-const editFormSchema = z.object({
-  name: z.string().min(1, "Nome é obrigatório"),
-  description: z.string().optional(),
-});
+const editFormSchema = z
+  .object({
+    name: z.string().min(1, "Nome é obrigatório"),
+    description: z.string().optional(),
+    fieldIds: z.array(z.string()),
+  })
+  .refine((data) => data.fieldIds.length > 0, {
+    message: "Selecione pelo menos um campo",
+    path: ["fieldIds"],
+  });
 
 export function TemplatesGrid({
   templates: initialTemplates,
@@ -84,14 +94,41 @@ export function TemplatesGrid({
   const [previewTemplate, setPreviewTemplate] = useState<any>(null);
   const [editingTemplate, setEditingTemplate] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [fieldsFilter, setFieldsFilter] = useState("");
+
+  const { data: allFields = [] } = useQuery({
+    queryKey: ["question-fields"],
+    queryFn: () => getQuestionFields(),
+  });
 
   const editForm = useForm({
     resolver: zodResolver(editFormSchema),
     defaultValues: {
       name: "",
       description: "",
+      fieldIds: [],
     },
   });
+
+  const selectedFieldIds = editForm.watch("fieldIds");
+
+  const filteredFields = allFields.filter(
+    (field: any) =>
+      field.name.toLowerCase().includes(fieldsFilter.toLowerCase()) ||
+      field.fieldKey.toLowerCase().includes(fieldsFilter.toLowerCase()),
+  );
+
+  const handleFieldToggle = (fieldId: string) => {
+    const current = editForm.getValues("fieldIds");
+    if (current.includes(fieldId)) {
+      editForm.setValue(
+        "fieldIds",
+        current.filter((id: string) => id !== fieldId),
+      );
+    } else {
+      editForm.setValue("fieldIds", [...current, fieldId]);
+    }
+  };
 
   const filteredTemplates = templates.filter((template) => {
     const matchesSearch =
@@ -110,9 +147,18 @@ export function TemplatesGrid({
     }
   };
 
-  const handleDelete = async (id: string, isSystem: boolean) => {
+  const handleDelete = async (
+    id: string,
+    isSystem: boolean,
+    usageCount: number,
+  ) => {
     if (isSystem) {
       toast.error("Templates do sistema não podem ser excluídos");
+      return;
+    }
+
+    if (usageCount > 0) {
+      toast.error("Template em uso não pode ser excluído");
       return;
     }
 
@@ -128,10 +174,15 @@ export function TemplatesGrid({
   };
 
   const handleEdit = (template: any) => {
+    if (template.usageCount > 0) {
+      toast.error("Template em uso não pode ser editado");
+      return;
+    }
     setEditingTemplate(template);
     editForm.reset({
       name: template.name,
       description: template.description || "",
+      fieldIds: template.fields?.map((f: any) => f.id) || [],
     });
     setIsEditing(true);
   };
@@ -143,6 +194,7 @@ export function TemplatesGrid({
       await updateQuestionnaireTemplate(editingTemplate.id, {
         name: data.name,
         description: data.description,
+        fieldIds: data.fieldIds,
       });
       toast.success("Template atualizado com sucesso");
       setIsEditing(false);
@@ -208,13 +260,21 @@ export function TemplatesGrid({
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               onSelect={() => handleEdit(template)}
+                              disabled={template.usageCount > 0}
                             >
                               <FileEdit className="mr-2 h-4 w-4" />
-                              Editar
+                              Editar{" "}
+                              {!template.isSystem &&
+                                template.usageCount > 0 &&
+                                "(em uso)"}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onSelect={() =>
-                                handleDelete(template.id, template.isSystem)
+                                handleDelete(
+                                  template.id,
+                                  template.isSystem,
+                                  template.usageCount,
+                                )
                               }
                               className="text-red-600"
                             >
@@ -272,10 +332,12 @@ export function TemplatesGrid({
 
       {/* Edit Dialog */}
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Editar Template</DialogTitle>
-            <DialogDescription>Altere os dados do template</DialogDescription>
+            <DialogDescription>
+              Altere os dados e os campos do template
+            </DialogDescription>
           </DialogHeader>
           <Form {...editForm}>
             <form
@@ -308,6 +370,65 @@ export function TemplatesGrid({
                   </FormItem>
                 )}
               />
+
+              <div className="space-y-2">
+                <FormLabel>Campos do Questionário</FormLabel>
+                <div className="relative">
+                  <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                  <Input
+                    placeholder="Buscar campos..."
+                    value={fieldsFilter}
+                    onChange={(e) => setFieldsFilter(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+                <div className="max-h-[250px] overflow-y-auto rounded-lg border p-4">
+                  {filteredFields.length === 0 ? (
+                    <p className="text-muted-foreground py-8 text-center">
+                      Nenhum campo encontrado
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {filteredFields.map((field: any) => (
+                        <div
+                          key={field.id}
+                          className="hover:bg-muted flex items-center justify-between rounded-lg p-2"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Checkbox
+                              checked={selectedFieldIds.includes(field.id)}
+                              onCheckedChange={() =>
+                                handleFieldToggle(field.id)
+                              }
+                            />
+                            <div>
+                              <p className="font-medium">{field.name}</p>
+                              <p className="text-muted-foreground text-xs">
+                                {field.fieldKey} • {field.fieldType}
+                                {field.unit && ` • ${field.unit}`}
+                              </p>
+                            </div>
+                          </div>
+                          {field.isRequired && (
+                            <Badge variant="outline" className="text-xs">
+                              Obrigatório
+                            </Badge>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <FormDescription>
+                  Selecione os campos que farão parte deste questionário
+                </FormDescription>
+                {editForm.formState.errors.fieldIds && (
+                  <p className="text-sm text-red-500">
+                    {editForm.formState.errors.fieldIds.message}
+                  </p>
+                )}
+              </div>
+
               <DialogFooter>
                 <Button
                   type="button"
