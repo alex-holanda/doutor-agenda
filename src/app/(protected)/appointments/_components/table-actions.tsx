@@ -4,7 +4,7 @@ import { MoreVerticalIcon, TrashIcon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
-import { deleteAppointment } from "@/actions/delete-appointment";
+import { cancelAppointment } from "@/actions/delete-appointment";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,18 +49,18 @@ interface AppointmentsTableActionsProps {
 const AppointmentsTableActions = ({
   appointment,
 }: AppointmentsTableActionsProps) => {
-  const deleteAppointmentAction = useAction(deleteAppointment, {
+  const cancelAppointmentAction = useAction(cancelAppointment, {
     onSuccess: () => {
-      toast.success("Agendamento deletado com sucesso.");
+      toast.success("Agendamento cancelado com sucesso.");
     },
     onError: () => {
-      toast.error("Erro ao deletar agendamento.");
+      toast.error("Erro ao cancelar agendamento.");
     },
   });
 
-  const handleDeleteAppointmentClick = () => {
+  const handleCancelAppointmentClick = () => {
     if (!appointment) return;
-    deleteAppointmentAction.execute({ id: appointment.id });
+    cancelAppointmentAction.execute({ id: appointment.id });
   };
 
   return (
@@ -77,23 +77,23 @@ const AppointmentsTableActions = ({
           <AlertDialogTrigger asChild>
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
               <TrashIcon />
-              Excluir
+              Cancelar
             </DropdownMenuItem>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>
-                Tem certeza que deseja deletar esse agendamento?
+                Tem certeza que deseja cancelar esse agendamento?
               </AlertDialogTitle>
               <AlertDialogDescription>
-                Essa ação não pode ser revertida. Isso irá deletar o agendamento
-                permanentemente.
+                Essa ação pode ser revertida. O agendamento será marcado como
+                cancelado.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDeleteAppointmentClick}>
-                Deletar
+              <AlertDialogCancel>Voltar</AlertDialogCancel>
+              <AlertDialogAction onClick={handleCancelAppointmentClick}>
+                Cancelar Agendamento
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

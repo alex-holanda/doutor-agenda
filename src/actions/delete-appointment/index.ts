@@ -8,7 +8,7 @@ import { db } from "@/db";
 import { appointmentsTable, attendancesTable } from "@/db/schema";
 import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 
-export const deleteAppointment = protectedWithClinicActionClient
+export const cancelAppointment = protectedWithClinicActionClient
   .schema(
     z.object({
       id: z.string().uuid(),
@@ -29,7 +29,7 @@ export const deleteAppointment = protectedWithClinicActionClient
       where: eq(attendancesTable.appointmentId, parsedInput.id),
     });
 
-    if (attendance) {
+    if (attendance && attendance.status !== "completed") {
       await db
         .update(attendancesTable)
         .set({ status: "cancelled" })
@@ -37,7 +37,8 @@ export const deleteAppointment = protectedWithClinicActionClient
     }
 
     await db
-      .delete(appointmentsTable)
+      .update(appointmentsTable)
+      .set({ status: "cancelled" })
       .where(eq(appointmentsTable.id, parsedInput.id));
     revalidatePath("/appointments");
     revalidatePath("/attendances");
