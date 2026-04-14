@@ -14,6 +14,7 @@ import {
   PageDescription,
 } from "@/components/ui/page-container";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { db } from "@/db";
 import { attendancesTable } from "@/db/schema";
 import { AttendanceFlow } from "./_components/attendance-flow";
@@ -66,6 +67,8 @@ export default async function AttendancePage({ params }: AttendancePageProps) {
     redirect(`/attendances/${attendanceId}/report`);
   }
 
+  const isCancelled = attendance.status === "cancelled";
+
   return (
     <WithAuthentication mustHaveClinic mustHavePlan>
       <PageContainer>
@@ -81,20 +84,33 @@ export default async function AttendancePage({ params }: AttendancePageProps) {
               {type.label}
             </Badge>
             <Badge variant="outline" className="text-xs">
+              {isCancelled && "Cancelado"}
               {attendance.status === "waiting" && "Aguardando"}
               {attendance.status === "in_progress" && "Em andamento"}
             </Badge>
           </div>
         </PageHeader>
-        <PageContent>
-          <AttendanceFlow
-            attendanceId={attendance.id}
-            patientName={attendance.patient.name}
-            doctorId={attendance.doctor.id}
-            initialStatus={attendance.status}
-            chiefComplaint={attendance.chiefComplaint}
-          />
-        </PageContent>
+        {isCancelled ? (
+          <PageContent>
+            <Card>
+              <CardContent className="py-8 text-center">
+                <p className="text-muted-foreground">
+                  Este atendimento foi cancelado.
+                </p>
+              </CardContent>
+            </Card>
+          </PageContent>
+        ) : (
+          <PageContent>
+            <AttendanceFlow
+              attendanceId={attendance.id}
+              patientName={attendance.patient.name}
+              doctorId={attendance.doctor.id}
+              initialStatus={attendance.status}
+              chiefComplaint={attendance.chiefComplaint}
+            />
+          </PageContent>
+        )}
       </PageContainer>
     </WithAuthentication>
   );

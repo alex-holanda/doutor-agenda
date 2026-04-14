@@ -13,6 +13,7 @@ import {
   medicalCertificatesTable,
   questionnaireResponsesTable,
   attendancesTable,
+  appointmentsTable,
   questionnairesTable,
   questionnaireTemplateFieldsTable,
 } from "@/db/schema";
@@ -98,6 +99,22 @@ export async function completeAttendance(attendanceId: string) {
     throw new Error("Não autorizado");
   }
 
+  const attendance = await db.query.attendancesTable.findFirst({
+    where: eq(attendancesTable.id, attendanceId),
+  });
+
+  if (!attendance) {
+    throw new Error("Atendimento não encontrado");
+  }
+
+  if (attendance.status === "cancelled") {
+    throw new Error("Atendimento cancelado não pode ser finalizado");
+  }
+
+  if (attendance.status === "completed") {
+    throw new Error("Atendimento já foi finalizado");
+  }
+
   await db
     .update(attendancesTable)
     .set({
@@ -106,6 +123,14 @@ export async function completeAttendance(attendanceId: string) {
     })
     .where(eq(attendancesTable.id, attendanceId));
 
+  if (attendance.appointmentId) {
+    await db
+      .update(appointmentsTable)
+      .set({ status: "completed" })
+      .where(eq(appointmentsTable.id, attendance.appointmentId));
+  }
+
+  revalidatePath("/appointments");
   revalidatePath(`/attendances/${attendanceId}`);
   revalidatePath("/attendances");
   return { success: true };
@@ -205,6 +230,22 @@ export async function saveVitalSigns(attendanceId: string, data: any) {
     throw new Error("Não autorizado");
   }
 
+  const attendance = await db.query.attendancesTable.findFirst({
+    where: eq(attendancesTable.id, attendanceId),
+  });
+
+  if (!attendance) {
+    throw new Error("Atendimento não encontrado");
+  }
+
+  if (attendance.status === "cancelled") {
+    throw new Error("Atendimento cancelado não pode ser editado");
+  }
+
+  if (attendance.status === "completed") {
+    throw new Error("Atendimento já foi finalizado");
+  }
+
   // Calcular IMC se peso e altura foram fornecidos
   let bmi: string | null = null;
   if (data.weight && data.height) {
@@ -275,6 +316,22 @@ export async function savePhysicalExam(attendanceId: string, data: any) {
     throw new Error("Não autorizado");
   }
 
+  const attendance = await db.query.attendancesTable.findFirst({
+    where: eq(attendancesTable.id, attendanceId),
+  });
+
+  if (!attendance) {
+    throw new Error("Atendimento não encontrado");
+  }
+
+  if (attendance.status === "cancelled") {
+    throw new Error("Atendimento cancelado não pode ser editado");
+  }
+
+  if (attendance.status === "completed") {
+    throw new Error("Atendimento já foi finalizado");
+  }
+
   const existing = await db.query.physicalExamsTable.findFirst({
     where: eq(physicalExamsTable.attendanceId, attendanceId),
   });
@@ -317,6 +374,22 @@ export async function savePrescription(attendanceId: string, data: any) {
 
   if (!session) {
     throw new Error("Não autorizado");
+  }
+
+  const attendance = await db.query.attendancesTable.findFirst({
+    where: eq(attendancesTable.id, attendanceId),
+  });
+
+  if (!attendance) {
+    throw new Error("Atendimento não encontrado");
+  }
+
+  if (attendance.status === "cancelled") {
+    throw new Error("Atendimento cancelado não pode ser editado");
+  }
+
+  if (attendance.status === "completed") {
+    throw new Error("Atendimento já foi finalizado");
   }
 
   const existing = await db.query.prescriptionsTable.findFirst({
@@ -428,10 +501,9 @@ export async function saveQuestionnaireResponse(
     throw new Error("Não autorizado");
   }
 
-  const doctorQuestionnaire =
-    await db.query.questionnairesTable.findFirst({
-      where: eq(questionnairesTable.id, questionnaireId),
-    });
+  const doctorQuestionnaire = await db.query.questionnairesTable.findFirst({
+    where: eq(questionnairesTable.id, questionnaireId),
+  });
 
   if (!doctorQuestionnaire) {
     throw new Error("Questionário não encontrado");
