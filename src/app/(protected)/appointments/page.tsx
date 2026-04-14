@@ -1,4 +1,4 @@
-import { and, eq, gte, lt, ne } from "drizzle-orm";
+import { and, eq, gte, lt, desc, asc } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -37,48 +37,67 @@ const AppointmentsPage = async ({ searchParams }: AppointmentsPageProps) => {
   }
 
   const { status } = await searchParams;
+  // Default: scheduled se não houver status
+  const currentStatus = status || "scheduled";
 
+  // Definir período do dia atual para agendamentos futuros
   const startOfToday = new Date();
-  const startOfTomorrow = new Date(startOfToday);
-
   startOfToday.setHours(0, 0, 0, 0);
-  startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
 
-  const [patients, doctors, appointments] = await Promise.all([
+  const endOfToday = new Date(startOfToday);
+  endOfToday.setDate(endOfToday.getDate() + 1);
+
+  // Buscar pacientes e médicos
+  const [patients, doctors] = await Promise.all([
     db.query.patientsTable.findMany({
-      where: eq(patientsTable.clinicId, session!.user.clinic!.id),
+      where: eq(patientsTable.clinicId, session.user.clinic.id),
     }),
     db.query.doctorsTable.findMany({
-      where: eq(doctorsTable.clinicId, session!.user.clinic!.id),
-    }),
-    db.query.appointmentsTable.findMany({
-      where: and(
-        eq(appointmentsTable.clinicId, session!.user.clinic!.id),
-        gte(appointmentsTable.date, startOfToday),
-        lt(appointmentsTable.date, startOfTomorrow),
-      ),
-      with: {
-        patient: true,
-        doctor: true,
-      },
+      where: eq(doctorsTable.clinicId, session.user.clinic.id),
     }),
   ]);
 
-  const filteredAppointments = appointments.filter((apt) => {
-    if (!status) {
-      return apt.status === "scheduled";
-    }
-    if (status === "completed") {
-      return apt.status === "completed";
-    }
-    if (status === "cancelled") {
-      return apt.status === "cancelled";
-    }
-    return true;
+  // Construir condições de busca
+  let conditions = [eq(appointmentsTable.clinicId, session.user.clinic.id)];
+  let orderBy: any = [asc(appointmentsTable.date)];
+
+  if (currentStatus === "completed") {
+    // Realizados: todos os agendamentos concluídos
+    conditions.push(eq(appointmentsTable.status, "completed"));
+    orderBy = [desc(appointmentsTable.date)];
+  } else if (currentStatus === "cancelled") {
+    // Cancelados: todos os agendamentos cancelados
+    conditions.push(eq(appointmentsTable.status, "cancelled"));
+    orderBy = [desc(appointmentsTable.date)];
+  } else if (currentStatus === "all") {
+    // Todos: todos os agendamentos (qualquer status)
+    // Sem filtro de status
+    orderBy = [desc(appointmentsTable.date)];
+  } else {
+    // Scheduled (default): apenas os do dia atual
+    conditions.push(
+      gte(appointmentsTable.date, startOfToday),
+      lt(appointmentsTable.date, endOfToday),
+      eq(appointmentsTable.status, "scheduled"),
+    );
+    orderBy = [asc(appointmentsTable.date)];
+  }
+
+  const appointments = await db.query.appointmentsTable.findMany({
+    where: and(...conditions),
+    with: {
+      patient: true,
+      doctor: true,
+    },
+    orderBy,
   });
 
   const statusOptions = [
-    { value: undefined, label: "Ativos", href: "/appointments" },
+    {
+      value: "scheduled",
+      label: "Agendados",
+      href: "/appointments?status=scheduled",
+    },
     {
       value: "completed",
       label: "Realizados",
@@ -89,23 +108,32 @@ const AppointmentsPage = async ({ searchParams }: AppointmentsPageProps) => {
       label: "Cancelados",
       href: "/appointments?status=cancelled",
     },
+    { value: "all", label: "Todos", href: "/appointments?status=all" },
   ];
+
+  const getPageTitle = () => {
+    if (currentStatus === "completed") return "Agendamentos Realizados";
+    if (currentStatus === "cancelled") return "Agendamentos Cancelados";
+    if (currentStatus === "all") return "Todos os Agendamentos";
+    return "Agendamentos";
+  };
+
+  const getPageDescription = () => {
+    if (currentStatus === "completed")
+      return "Histórico de consultas realizadas";
+    if (currentStatus === "cancelled")
+      return "Histórico de consultas canceladas";
+    if (currentStatus === "all") return "Todos os agendamentos da clínica";
+    return "Agendamentos para hoje";
+  };
 
   return (
     <WithAuthentication mustHaveClinic mustHavePlan>
       <PageContainer>
         <PageHeader>
           <PageHeaderContent>
-            <PageTitle>Agendamentos</PageTitle>
-            <PageDescription>
-              {!status
-                ? "Agendamentos ativos"
-                : status === "completed"
-                  ? "Agendamentos realizados"
-                  : status === "cancelled"
-                    ? "Agendamentos cancelados"
-                    : "Todos os agendamentos"}
-            </PageDescription>
+            <PageTitle>{getPageTitle()}</PageTitle>
+            <PageDescription>{getPageDescription()}</PageDescription>
           </PageHeaderContent>
           <PageActions>
             <AddAppointmentButton patients={patients} doctors={doctors} />
@@ -114,8 +142,8 @@ const AppointmentsPage = async ({ searchParams }: AppointmentsPageProps) => {
         <div className="flex flex-wrap gap-2 pb-4">
           {statusOptions.map((option) => (
             <Button
-              key={option.value ?? "active"}
-              variant={status === option.value ? "default" : "outline"}
+              key={option.value}
+              variant={currentStatus === option.value ? "default" : "outline"}
               size="sm"
               asChild
             >
@@ -124,10 +152,7 @@ const AppointmentsPage = async ({ searchParams }: AppointmentsPageProps) => {
           ))}
         </div>
         <PageContent>
-          <DataTable
-            data={filteredAppointments}
-            columns={appointmentsTableColumns}
-          />
+          <DataTable data={appointments} columns={appointmentsTableColumns} />
         </PageContent>
       </PageContainer>
     </WithAuthentication>
