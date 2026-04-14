@@ -63,6 +63,8 @@ const AppointmentsTableActions = ({
     cancelAppointmentAction.execute({ id: appointment.id });
   };
 
+  const canCancel = appointment.status === "scheduled";
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -73,31 +75,40 @@ const AppointmentsTableActions = ({
       <DropdownMenuContent>
         <DropdownMenuLabel>{appointment.patient.name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-              <TrashIcon />
-              Cancelar
-            </DropdownMenuItem>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                Tem certeza que deseja cancelar esse agendamento?
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                Essa ação pode ser revertida. O agendamento será marcado como
-                cancelado.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Voltar</AlertDialogCancel>
-              <AlertDialogAction onClick={handleCancelAppointmentClick}>
-                Cancelar Agendamento
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        {canCancel && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <TrashIcon />
+                Cancelar
+              </DropdownMenuItem>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Tem certeza que deseja cancelar esse agendamento?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  Essa ação pode ser revertida. O agendamento será marcado como
+                  cancelado.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Voltar</AlertDialogCancel>
+                <AlertDialogAction onClick={handleCancelAppointmentClick}>
+                  Cancelar Agendamento
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+        {!canCancel && (
+          <DropdownMenuItem disabled>
+            {appointment.status === "cancelled"
+              ? "Agendamento cancelado"
+              : "Agendamento realizado"}
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

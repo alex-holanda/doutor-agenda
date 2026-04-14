@@ -3,7 +3,7 @@
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@/db";
@@ -36,7 +36,10 @@ export const getAvailableTimes = protectedWithClinicActionClient
       return [];
     }
     const appointments = await db.query.appointmentsTable.findMany({
-      where: eq(appointmentsTable.doctorId, parsedInput.doctorId),
+      where: and(
+        eq(appointmentsTable.doctorId, parsedInput.doctorId),
+        eq(appointmentsTable.status, "scheduled"),
+      ),
     });
     const appointmentsOnSelectedDate = appointments
       .filter((appointment) => {

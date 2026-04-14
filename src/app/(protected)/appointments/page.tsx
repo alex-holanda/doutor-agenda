@@ -56,7 +56,7 @@ const AppointmentsPage = async ({ searchParams }: AppointmentsPageProps) => {
 
   const filteredAppointments = appointments.filter((apt) => {
     if (!status) {
-      return apt.status !== "cancelled";
+      return apt.status === "scheduled";
     }
     if (status === "completed") {
       return apt.status === "completed";
