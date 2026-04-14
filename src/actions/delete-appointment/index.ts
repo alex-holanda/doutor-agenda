@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { appointmentsTable } from "@/db/schema";
+import { appointmentsTable, attendancesTable } from "@/db/schema";
 import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 
 export const deleteAppointment = protectedWithClinicActionClient
@@ -24,8 +24,21 @@ export const deleteAppointment = protectedWithClinicActionClient
     if (appointment.clinicId !== ctx.user.clinic.id) {
       throw new Error("Agendamento não encontrado");
     }
+
+    const attendance = await db.query.attendancesTable.findFirst({
+      where: eq(attendancesTable.appointmentId, parsedInput.id),
+    });
+
+    if (attendance) {
+      await db
+        .update(attendancesTable)
+        .set({ status: "cancelled" })
+        .where(eq(attendancesTable.id, attendance.id));
+    }
+
     await db
       .delete(appointmentsTable)
       .where(eq(appointmentsTable.id, parsedInput.id));
     revalidatePath("/appointments");
+    revalidatePath("/attendances");
   });
