@@ -119,7 +119,29 @@ export async function createQuestionField(data: z.infer<typeof fieldSchema>) {
 // Atualizar campo
 export async function updateQuestionField(
   id: string,
-  data: Partial<z.infer<typeof fieldSchema>>,
+  data: Partial<{
+    name: string;
+    fieldType:
+      | "text"
+      | "textarea"
+      | "number"
+      | "select"
+      | "multi_select"
+      | "radio"
+      | "checkbox"
+      | "date"
+      | "time"
+      | "boolean"
+      | "scale";
+    description: string;
+    unit: string;
+    minValue: number;
+    maxValue: number;
+    options: string[];
+    placeholder: string;
+    helpText: string;
+    isRequired: boolean;
+  }>,
 ) {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -138,10 +160,40 @@ export async function updateQuestionField(
     throw new Error("Campos do sistema não podem ser editados");
   }
 
+  // Regenerar fieldKey se o nome mudou
+  let newFieldKey = existing?.fieldKey;
+  if (data.name && data.name !== existing?.name) {
+    newFieldKey = generateFieldKey(data.name);
+
+    // Verificar se já existe
+    let duplicate = await db.query.questionnaireFieldsTable.findFirst({
+      where: eq(questionnaireFieldsTable.fieldKey, newFieldKey),
+    });
+
+    let counter = 1;
+    while (duplicate && duplicate.id !== id) {
+      newFieldKey = `${generateFieldKey(data.name)}_${counter}`;
+      duplicate = await db.query.questionnaireFieldsTable.findFirst({
+        where: eq(questionnaireFieldsTable.fieldKey, newFieldKey),
+      });
+      counter++;
+    }
+  }
+
   await db
     .update(questionnaireFieldsTable)
     .set({
-      ...data,
+      name: data.name,
+      fieldKey: newFieldKey,
+      fieldType: data.fieldType,
+      description: data.description,
+      unit: data.unit,
+      minValue: data.minValue || null,
+      maxValue: data.maxValue || null,
+      options: data.options,
+      placeholder: data.placeholder,
+      helpText: data.helpText,
+      isRequired: data.isRequired || false,
       updatedAt: new Date(),
     })
     .where(eq(questionnaireFieldsTable.id, id));

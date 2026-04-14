@@ -30,8 +30,10 @@ import {
 import { Pencil, Trash2, Search, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { FieldForm } from "./field-form";
-
-// import { updateQuestionField, deleteQuestionField } from "../actions";
+import {
+  updateQuestionField,
+  deleteQuestionField,
+} from "@/actions/question-fields";
 
 interface FieldsTableProps {
   fields: any[];
@@ -72,14 +74,12 @@ export function FieldsTable({ fields: initialFields }: FieldsTableProps) {
     const matchesSearch =
       field.name.toLowerCase().includes(search.toLowerCase()) ||
       field.fieldKey.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory =
-      categoryFilter === "all" || field.category === categoryFilter;
-    return matchesSearch && matchesCategory;
+    return matchesSearch;
   });
 
   const handleEdit = async (data: any) => {
     try {
-      // await updateQuestionField(editingField.id, data);
+      await updateQuestionField(editingField.id, data);
       toast.success("Campo atualizado com sucesso");
       setIsEditOpen(false);
       window.location.reload();
@@ -97,7 +97,7 @@ export function FieldsTable({ fields: initialFields }: FieldsTableProps) {
     if (!confirm("Tem certeza que deseja excluir este campo?")) return;
 
     try {
-      // await deleteQuestionField(id);
+      await deleteQuestionField(id);
       toast.success("Campo excluído com sucesso");
       window.location.reload();
     } catch (error: any) {
