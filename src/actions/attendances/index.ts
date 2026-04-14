@@ -147,7 +147,10 @@ export async function getDoctorQuestionnaires(doctorId: string) {
   }
 
   const questionnaires = await db.query.questionnairesTable.findMany({
-    where: eq(questionnairesTable.doctorId, doctorId),
+    where: and(
+      eq(questionnairesTable.doctorId, doctorId),
+      eq(questionnairesTable.isActive, true),
+    ),
     with: {
       template: true,
     },
