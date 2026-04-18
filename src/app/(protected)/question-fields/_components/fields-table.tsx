@@ -221,7 +221,7 @@ export function FieldsTable({ fields: initialFields }: FieldsTableProps) {
 
       {/* Dialog de Visualização */}
       <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-[calc(100vh-2rem)] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{viewingField?.name}</DialogTitle>
             <DialogDescription>Detalhes do campo</DialogDescription>

@@ -86,7 +86,7 @@ export default function AddQuestionnaireButton({
           Novo Questionário
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-h-[calc(100vh-2rem)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Criar Questionário</DialogTitle>
           <DialogDescription>

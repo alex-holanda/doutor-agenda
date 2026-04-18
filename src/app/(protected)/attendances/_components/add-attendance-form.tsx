@@ -101,7 +101,7 @@ const AddWalkInAttendanceForm = ({
   };
 
   return (
-    <DialogContent className="sm:max-w-[500px]">
+    <DialogContent className="sm:max-w-[500px] max-h-[calc(100vh-2rem)] overflow-y-auto">
       <DialogHeader>
         <DialogTitle>Novo atendimento</DialogTitle>
         <DialogDescription>

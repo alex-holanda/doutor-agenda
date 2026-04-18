@@ -171,7 +171,7 @@ const AddAppointmentForm = ({
   const isDateTimeEnabled = selectedPatientId && selectedDoctorId;
 
   return (
-    <DialogContent className="sm:max-w-125">
+    <DialogContent className="sm:max-w-125 max-h-[calc(100vh-2rem)] overflow-y-auto">
       <DialogHeader>
         <DialogTitle>Novo agendamento</DialogTitle>
         <DialogDescription>

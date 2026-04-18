@@ -286,7 +286,7 @@ export function QuestionnairesList({
 
       {/* Edit Dialog */}
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
-        <DialogContent>
+        <DialogContent className="max-h-[calc(100vh-2rem)] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Editar Questionário</DialogTitle>
             <DialogDescription>Altere o nome do questionário</DialogDescription>

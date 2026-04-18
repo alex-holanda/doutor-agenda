@@ -94,7 +94,7 @@ const UpsertPatientForm = ({
   };
 
   return (
-    <DialogContent>
+    <DialogContent className="max-h-[calc(100vh-2rem)] overflow-y-auto">
       <DialogHeader>
         <DialogTitle>
           {patient ? patient.name : "Adicionar paciente"}
