@@ -344,6 +344,17 @@ export const vitalSignsTable = pgTable(
     weight: decimal("weight", { precision: 5, scale: 2 }),
     height: decimal("height", { precision: 5, scale: 2 }),
     bmi: decimal("bmi", { precision: 4, scale: 1 }),
+    abdominalCircumference: decimal("abdominal_circumference", {
+      precision: 5,
+      scale: 1,
+    }),
+    hipCircumference: decimal("hip_circumference", { precision: 5, scale: 1 }),
+    waistHipRatio: decimal("waist_hip_ratio", { precision: 4, scale: 2 }),
+    armCircumference: decimal("arm_circumference", { precision: 5, scale: 1 }),
+    calfCircumference: decimal("calf_circumference", {
+      precision: 5,
+      scale: 1,
+    }),
     painScale: integer("pain_scale"),
     notes: text("notes"),
     createdAt: timestamp("created_at").defaultNow().notNull(),

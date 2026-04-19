@@ -44,6 +44,40 @@ export function VitalSignsStep({ initialData }: VitalSignsStepProps) {
     };
   }, []);
 
+  // Calcular relação cintura-quadril automaticamente
+  useEffect(() => {
+    const abdominalInput = document.querySelector(
+      'input[name="abdominalCircumference"]',
+    ) as HTMLInputElement;
+    const hipInput = document.querySelector(
+      'input[name="hipCircumference"]',
+    ) as HTMLInputElement;
+
+    const calculateWaistHip = () => {
+      const abdominal = parseFloat(abdominalInput?.value);
+      const hip = parseFloat(hipInput?.value);
+
+      if (abdominal && hip && hip > 0) {
+        const ratio = abdominal / hip;
+        // Armazenar em campo oculto para submissão
+        const hiddenInput = document.querySelector(
+          'input[name="waistHipRatio"]',
+        ) as HTMLInputElement;
+        if (hiddenInput) {
+          hiddenInput.value = ratio.toFixed(2);
+        }
+      }
+    };
+
+    abdominalInput?.addEventListener("input", calculateWaistHip);
+    hipInput?.addEventListener("input", calculateWaistHip);
+
+    return () => {
+      abdominalInput?.removeEventListener("input", calculateWaistHip);
+      hipInput?.removeEventListener("input", calculateWaistHip);
+    };
+  }, []);
+
   // Atualizar o valor da escala de dor visualmente
   const updatePainScaleValue = (value: string) => {
     const span = document.getElementById("painScaleValue");
@@ -194,7 +228,7 @@ export function VitalSignsStep({ initialData }: VitalSignsStepProps) {
               />
             </div>
           </div>
-          <div className="grid grid-cols-1 md:max-w-xs">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="bmi">IMC</Label>
               <Input
@@ -206,6 +240,54 @@ export function VitalSignsStep({ initialData }: VitalSignsStepProps) {
                 defaultValue={initialData?.bmi}
                 readOnly
                 className="bg-muted"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="abdominalCircumference">Circunferência Abdominal</Label>
+              <Input
+                id="abdominalCircumference"
+                name="abdominalCircumference"
+                type="number"
+                step="0.1"
+                placeholder="cm"
+                defaultValue={initialData?.abdominalCircumference}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="hipCircumference">Circunferência do Quadril</Label>
+              <Input
+                id="hipCircumference"
+                name="hipCircumference"
+                type="number"
+                step="0.1"
+                placeholder="cm"
+                defaultValue={initialData?.hipCircumference}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="armCircumference">Circunferência do Braço</Label>
+              <Input
+                id="armCircumference"
+                name="armCircumference"
+                type="number"
+                step="0.1"
+                placeholder="cm"
+                defaultValue={initialData?.armCircumference}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="calfCircumference">Circunferência da Panturrilha</Label>
+              <Input
+                id="calfCircumference"
+                name="calfCircumference"
+                type="number"
+                step="0.1"
+                placeholder="cm"
+                defaultValue={initialData?.calfCircumference}
               />
             </div>
           </div>
@@ -258,6 +340,7 @@ export function VitalSignsStep({ initialData }: VitalSignsStepProps) {
         </div>
 
         {/* Campos ocultos para metadados */}
+        <input type="hidden" name="waistHipRatio" value={initialData?.waistHipRatio || ""} />
         <input type="hidden" name="measuredBy" value="doctor" />
       </CardContent>
     </Card>

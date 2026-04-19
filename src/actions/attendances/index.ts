@@ -258,6 +258,16 @@ export async function saveVitalSigns(attendanceId: string, data: any) {
     bmi = calculatedBmi.toFixed(1);
   }
 
+  // Calcular relação cintura-quadril automaticamente
+  let waistHipRatio: string | null = null;
+  if (data.abdominalCircumference && data.hipCircumference) {
+    const abdominal = parseFloat(data.abdominalCircumference);
+    const hip = parseFloat(data.hipCircumference);
+    if (hip > 0) {
+      waistHipRatio = (abdominal / hip).toFixed(2);
+    }
+  }
+
   const existing = await db.query.vitalSignsTable.findFirst({
     where: eq(vitalSignsTable.attendanceId, attendanceId),
   });
@@ -284,6 +294,19 @@ export async function saveVitalSigns(attendanceId: string, data: any) {
     weight: data.weight ? data.weight.toString() : null,
     height: data.height ? data.height.toString() : null,
     bmi: bmi,
+    abdominalCircumference: data.abdominalCircumference
+      ? data.abdominalCircumference.toString()
+      : null,
+    hipCircumference: data.hipCircumference
+      ? data.hipCircumference.toString()
+      : null,
+    waistHipRatio: waistHipRatio,
+    armCircumference: data.armCircumference
+      ? data.armCircumference.toString()
+      : null,
+    calfCircumference: data.calfCircumference
+      ? data.calfCircumference.toString()
+      : null,
     painScale: data.painScale ? parseInt(data.painScale) : null,
     notes: data.notes || null,
   };
