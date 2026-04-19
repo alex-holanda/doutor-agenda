@@ -362,10 +362,10 @@ export function AttendanceFlow({
         onSubmit={(e) => e.preventDefault()}
       >
         {currentStepInfo.id === "vital-signs" && (
-          <VitalSignsStep initialData={savedData.vitalSigns} />
+          <VitalSignsStep initialData={savedData["vital-signs"]} />
         )}
         {currentStepInfo.id === "physical-exam" && (
-          <PhysicalExamStep initialData={savedData.physicalExam} />
+          <PhysicalExamStep initialData={savedData["physical-exam"]} />
         )}
         {currentStepInfo.id !== "vital-signs" &&
           currentStepInfo.id !== "physical-exam" &&
