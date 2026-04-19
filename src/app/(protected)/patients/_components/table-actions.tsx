@@ -1,4 +1,5 @@
-import { EditIcon, MoreVerticalIcon, TrashIcon } from "lucide-react";
+import { EyeIcon, EditIcon, MoreVerticalIcon, TrashIcon } from "lucide-react";
+import Link from "next/link";
 import { useAction } from "next-safe-action/hooks";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -62,6 +63,12 @@ const PatientsTableActions = ({ patient }: PatientsTableActionsProps) => {
           <DropdownMenuContent>
             <DropdownMenuLabel>{patient.name}</DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <Link href={`/patients/${patient.id}`}>
+              <DropdownMenuItem>
+                <EyeIcon />
+                Ver detalhes
+              </DropdownMenuItem>
+            </Link>
             <DropdownMenuItem onClick={() => setUpsertDialogIsOpen(true)}>
               <EditIcon />
               Editar

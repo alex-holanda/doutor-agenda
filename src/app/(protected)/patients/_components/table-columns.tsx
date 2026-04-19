@@ -1,6 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
+import Link from "next/link";
 
 import { patientsTable } from "@/db/schema";
 
@@ -13,6 +14,17 @@ export const patientsTableColumns: ColumnDef<Patient>[] = [
     id: "name",
     accessorKey: "name",
     header: "Nome",
+    cell: (params) => {
+      const patient = params.row.original;
+      return (
+        <Link
+          href={`/patients/${patient.id}`}
+          className="font-medium hover:underline"
+        >
+          {patient.name}
+        </Link>
+      );
+    },
   },
   {
     id: "email",
