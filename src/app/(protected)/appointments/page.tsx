@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/page-container";
 import { Button } from "@/components/ui/button";
 import { db } from "@/db";
-import { appointmentsTable, doctorsTable, patientsTable } from "@/db/schema";
+import { appointmentsTable, professionalsTable, patientsTable } from "@/db/schema";
 import WithAuthentication from "@/hocs/with-authentication";
 import { auth } from "@/lib/auth";
 
@@ -52,8 +52,8 @@ const AppointmentsPage = async ({ searchParams }: AppointmentsPageProps) => {
     db.query.patientsTable.findMany({
       where: eq(patientsTable.clinicId, session.user.clinic.id),
     }),
-    db.query.doctorsTable.findMany({
-      where: eq(doctorsTable.clinicId, session.user.clinic.id),
+    db.query.professionalsTable.findMany({
+      where: eq(professionalsTable.clinicId, session.user.clinic.id),
     }),
   ]);
 

@@ -7,7 +7,7 @@ import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { appointmentsTable, doctorsTable } from "@/db/schema";
+import { appointmentsTable, professionalsTable } from "@/db/schema";
 import { generateTimeSlots } from "@/helpers/time";
 import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 
@@ -22,8 +22,8 @@ export const getAvailableTimes = protectedWithClinicActionClient
     }),
   )
   .action(async ({ parsedInput }) => {
-    const doctor = await db.query.doctorsTable.findFirst({
-      where: eq(doctorsTable.id, parsedInput.doctorId),
+    const doctor = await db.query.professionalsTable.findFirst({
+      where: eq(professionalsTable.id, parsedInput.doctorId),
     });
     if (!doctor) {
       throw new Error("Médico não encontrado");

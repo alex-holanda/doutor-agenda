@@ -10,7 +10,7 @@ import { useAction } from "next-safe-action/hooks";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { deleteDoctor } from "@/actions/delete-doctor";
+import { deleteProfessional } from "@/actions/delete-professional";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,48 +33,50 @@ import {
 } from "@/components/ui/card";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { doctorsTable } from "@/db/schema";
+import { professionalsTable } from "@/db/schema";
 import { formatCurrencyInCents } from "@/helpers/currency";
 
 import { getAvailability } from "../_helpers/availability";
-import UpsertDoctorForm from "./upsert-doctor-form";
+import UpsertProfessionalForm from "./upsert-professional-form";
 
-interface DoctorCardProps {
-  doctor: typeof doctorsTable.$inferSelect;
+interface ProfessionalCardProps {
+  professional: typeof professionalsTable.$inferSelect;
 }
 
-const DoctorCard = ({ doctor }: DoctorCardProps) => {
-  const [isUpsertDoctorDialogOpen, setIsUpsertDoctorDialogOpen] =
-    useState(false);
-  const deleteDoctorAction = useAction(deleteDoctor, {
+const ProfessionalCard = ({ professional }: ProfessionalCardProps) => {
+  const [isUpsertDialogOpen, setIsUpsertDialogOpen] = useState(false);
+  const deleteAction = useAction(deleteProfessional, {
     onSuccess: () => {
-      toast.success("Médico deletado com sucesso.");
+      toast.success("Profissional deletado com sucesso.");
     },
     onError: () => {
-      toast.error("Erro ao deletar médico.");
+      toast.error("Erro ao deletar profissional.");
     },
   });
-  const handleDeleteDoctorClick = () => {
-    if (!doctor) return;
-    deleteDoctorAction.execute({ id: doctor.id });
+  const handleDeleteClick = () => {
+    if (!professional) return;
+    deleteAction.execute({ id: professional.id });
   };
 
-  const doctorInitials = doctor.name
+  const initials = professional.name
     .split(" ")
     .map((name) => name[0])
-    .join("");
-  const availability = getAvailability(doctor);
+    .join("")
+    .slice(0, 2);
+  const availability = getAvailability(professional);
 
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
           <Avatar className="h-10 w-10">
-            <AvatarFallback>{doctorInitials}</AvatarFallback>
+            <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="text-sm font-medium">{doctor.name}</h3>
-            <p className="text-muted-foreground text-sm">{doctor.specialty}</p>
+            <h3 className="text-sm font-medium">{professional.name}</h3>
+            <p className="text-muted-foreground text-sm">
+              {professional.role === "nurse" ? "Enfermeiro" : "Médico"} - {professional.specialty}
+            </p>
           </div>
         </div>
       </CardHeader>
@@ -91,48 +93,44 @@ const DoctorCard = ({ doctor }: DoctorCardProps) => {
         </Badge>
         <Badge variant="outline">
           <DollarSignIcon className="mr-1" />
-          {formatCurrencyInCents(doctor.appointmentPriceInCents)}
+          {formatCurrencyInCents(professional.appointmentPriceInCents)}
         </Badge>
       </CardContent>
       <Separator />
       <CardFooter className="flex flex-col gap-2">
-        <Dialog
-          open={isUpsertDoctorDialogOpen}
-          onOpenChange={setIsUpsertDoctorDialogOpen}
-        >
+        <Dialog open={isUpsertDialogOpen} onOpenChange={setIsUpsertDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="w-full">Ver detalhes</Button>
+            <Button className="w-full">Editar</Button>
           </DialogTrigger>
-          <UpsertDoctorForm
-            doctor={{
-              ...doctor,
+          <UpsertProfessionalForm
+            professional={{
+              ...professional,
               availableFromTime: availability.from.format("HH:mm:ss"),
               availableToTime: availability.to.format("HH:mm:ss"),
             }}
-            onSuccess={() => setIsUpsertDoctorDialogOpen(false)}
-            isOpen={isUpsertDoctorDialogOpen}
+            onSuccess={() => setIsUpsertDialogOpen(false)}
+            isOpen={isUpsertDialogOpen}
           />
         </Dialog>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="outline" className="w-full">
               <TrashIcon />
-              Deletar médico
+              Deletar
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>
-                Tem certeza que deseja deletar esse médico?
+                Tem certeza que deseja deletar?
               </AlertDialogTitle>
               <AlertDialogDescription>
-                Essa ação não pode ser revertida. Isso irá deletar o médico e
-                todas as consultas agendadas.
+                Essa ação não pode ser revertida.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDeleteDoctorClick}>
+              <AlertDialogAction onClick={handleDeleteClick}>
                 Deletar
               </AlertDialogAction>
             </AlertDialogFooter>
@@ -143,4 +141,4 @@ const DoctorCard = ({ doctor }: DoctorCardProps) => {
   );
 };
 
-export default DoctorCard;
+export default ProfessionalCard;

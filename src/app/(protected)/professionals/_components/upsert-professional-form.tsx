@@ -6,7 +6,7 @@ import { NumericFormat } from "react-number-format";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { upsertDoctor } from "@/actions/upsert-doctor";
+import { upsertProfessional } from "@/actions/upsert-professional";
 import { Button } from "@/components/ui/button";
 import {
   DialogContent,
@@ -33,7 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { doctorsTable } from "@/db/schema";
+import { professionalsTable } from "@/db/schema";
 
 import { medicalSpecialties } from "../_constants";
 
@@ -41,6 +41,9 @@ const formSchema = z
   .object({
     name: z.string().trim().min(1, {
       message: "Nome é obrigatório.",
+    }),
+    role: z.enum(["doctor", "nurse"], {
+      message: "Função é obrigatória.",
     }),
     specialty: z.string().trim().min(1, {
       message: "Especialidade é obrigatória.",
@@ -68,50 +71,54 @@ const formSchema = z
     },
   );
 
-interface UpsertDoctorFormProps {
+interface UpsertProfessionalFormProps {
   isOpen: boolean;
-  doctor?: typeof doctorsTable.$inferSelect;
+  professional?: typeof professionalsTable.$inferSelect;
   onSuccess?: () => void;
 }
 
-const UpsertDoctorForm = ({
-  doctor,
+const UpsertProfessionalForm = ({
+  professional,
   onSuccess,
   isOpen,
-}: UpsertDoctorFormProps) => {
+}: UpsertProfessionalFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     shouldUnregister: true,
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: doctor?.name ?? "",
-      specialty: doctor?.specialty ?? "",
-      appointmentPrice: doctor?.appointmentPriceInCents
-        ? doctor.appointmentPriceInCents / 100
+      name: professional?.name ?? "",
+      role: (professional?.role as "doctor" | "nurse") ?? "doctor",
+      specialty: professional?.specialty ?? "",
+      appointmentPrice: professional?.appointmentPriceInCents
+        ? professional.appointmentPriceInCents / 100
         : 0,
-      availableFromWeekDay: doctor?.availableFromWeekDay?.toString() ?? "1",
-      availableToWeekDay: doctor?.availableToWeekDay?.toString() ?? "5",
-      availableFromTime: doctor?.availableFromTime ?? "",
-      availableToTime: doctor?.availableToTime ?? "",
+      availableFromWeekDay:
+        professional?.availableFromWeekDay.toString() ?? "1",
+      availableToWeekDay: professional?.availableToWeekDay.toString() ?? "5",
+      availableFromTime: professional?.availableFromTime ?? "08:00:00",
+      availableToTime: professional?.availableToTime ?? "18:00:00",
     },
   });
 
   useEffect(() => {
     if (isOpen) {
       form.reset({
-        name: doctor?.name ?? "",
-        specialty: doctor?.specialty ?? "",
-        appointmentPrice: doctor?.appointmentPriceInCents
-          ? doctor.appointmentPriceInCents / 100
+        name: professional?.name ?? "",
+        role: (professional?.role as "doctor" | "nurse") ?? "doctor",
+        specialty: professional?.specialty ?? "",
+        appointmentPrice: professional?.appointmentPriceInCents
+          ? professional.appointmentPriceInCents / 100
           : 0,
-        availableFromWeekDay: doctor?.availableFromWeekDay?.toString() ?? "1",
-        availableToWeekDay: doctor?.availableToWeekDay?.toString() ?? "5",
-        availableFromTime: doctor?.availableFromTime ?? "",
-        availableToTime: doctor?.availableToTime ?? "",
+        availableFromWeekDay:
+          professional?.availableFromWeekDay?.toString() ?? "1",
+        availableToWeekDay: professional?.availableToWeekDay?.toString() ?? "5",
+        availableFromTime: professional?.availableFromTime ?? "",
+        availableToTime: professional?.availableToTime ?? "",
       });
     }
-  }, [isOpen, form, doctor]);
+  }, [isOpen, form, professional]);
 
-  const upsertDoctorAction = useAction(upsertDoctor, {
+  const upsertProfessionalAction = useAction(upsertProfessional, {
     onSuccess: () => {
       toast.success("Médico adicionado com sucesso.");
       onSuccess?.();
@@ -122,9 +129,10 @@ const UpsertDoctorForm = ({
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    upsertDoctorAction.execute({
+    upsertProfessionalAction.execute({
       ...values,
-      id: doctor?.id,
+      id: professional?.id,
+      role: values.role,
       availableFromWeekDay: parseInt(values.availableFromWeekDay),
       availableToWeekDay: parseInt(values.availableToWeekDay),
       appointmentPriceInCents: values.appointmentPrice * 100,
@@ -134,11 +142,13 @@ const UpsertDoctorForm = ({
   return (
     <DialogContent className="max-h-[calc(100vh-2rem)] overflow-y-auto">
       <DialogHeader>
-        <DialogTitle>{doctor ? doctor.name : "Adicionar médico"}</DialogTitle>
+        <DialogTitle>
+          {professional ? professional.name : "Adicionar profissional"}
+        </DialogTitle>
         <DialogDescription>
-          {doctor
-            ? "Edite as informações desse médico."
-            : "Adicione um novo médico."}
+          {professional
+            ? "Edite as informações desse profissional."
+            : "Adicione um novo profissional."}
         </DialogDescription>
       </DialogHeader>
       <Form {...form}>
@@ -156,32 +166,65 @@ const UpsertDoctorForm = ({
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
-            name="specialty"
+            name="role"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Especialidade</FormLabel>
+                <FormLabel>Função</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
                   <FormControl>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Selecione uma especialidade" />
+                      <SelectValue placeholder="Selecione a função" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {medicalSpecialties.map((specialty) => (
-                      <SelectItem key={specialty.value} value={specialty.value}>
-                        {specialty.label}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="doctor">Médico</SelectItem>
+                    <SelectItem value="nurse">Enfermeiro</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
               </FormItem>
             )}
+          />
+
+          <FormField
+            control={form.control}
+            name="specialty"
+            render={({ field }) => {
+              const selectedRoleValue = form.watch("role");
+              const isNurse = selectedRoleValue === "nurse";
+              return (
+                <FormItem>
+                  <FormLabel>{isNurse ? "Função" : "Especialidade"}</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione uma especialidade" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {medicalSpecialties.map((specialty) => (
+                        <SelectItem
+                          key={specialty.value}
+                          value={specialty.value}
+                        >
+                          {specialty.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
           <FormField
             control={form.control}
@@ -404,10 +447,10 @@ const UpsertDoctorForm = ({
             )}
           />
           <DialogFooter>
-            <Button type="submit" disabled={upsertDoctorAction.isPending}>
-              {upsertDoctorAction.isPending
+            <Button type="submit" disabled={upsertProfessionalAction.isPending}>
+              {upsertProfessionalAction.isPending
                 ? "Salvando..."
-                : doctor
+                : professional
                   ? "Salvar"
                   : "Adicionar"}
             </Button>
@@ -418,4 +461,4 @@ const UpsertDoctorForm = ({
   );
 };
 
-export default UpsertDoctorForm;
+export default UpsertProfessionalForm;

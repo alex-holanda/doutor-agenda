@@ -177,11 +177,11 @@ export const usersToClinicsTable = pgTable(
 );
 
 // =============================================
-// MÉDICOS E PACIENTES
+// PROFISSIONAIS DE SAÚDE
 // =============================================
 
-export const doctorsTable = pgTable(
-  "doctors",
+export const professionalsTable = pgTable(
+  "professionals",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     clinicId: uuid("clinic_id")
@@ -189,11 +189,12 @@ export const doctorsTable = pgTable(
       .references(() => clinicsTable.id, { onDelete: "cascade" }),
     userId: text("user_id").references(() => usersTable.id),
     name: text("name").notNull(),
-    crm: text("crm"),
+    role: text("role").notNull(), // "doctor" | "nurse"
+    registerNumber: text("register_number"), // CRM para médicos, COREN para enfermeiros
     phone: text("phone"),
     email: text("email"),
     avatarImageUrl: text("avatar_image_url"),
-    specialty: text("specialty").notNull(),
+    specialty: text("specialty").notNull(), // especialidade médica ou função de enfermagem
     availableFromWeekDay: integer("available_from_week_day").notNull(),
     availableToWeekDay: integer("available_to_week_day").notNull(),
     availableFromTime: time("available_from_time").notNull(),
@@ -206,9 +207,10 @@ export const doctorsTable = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [
-    index("idx_doctors_clinic_id").on(table.clinicId),
-    index("idx_doctors_user_id").on(table.userId),
-    index("idx_doctors_specialty").on(table.specialty),
+    index("idx_professionals_clinic_id").on(table.clinicId),
+    index("idx_professionals_user_id").on(table.userId),
+    index("idx_professionals_role").on(table.role),
+    index("idx_professionals_specialty").on(table.specialty),
   ],
 );
 
@@ -263,7 +265,7 @@ export const appointmentsTable = pgTable(
       .references(() => patientsTable.id, { onDelete: "cascade" }),
     doctorId: uuid("doctor_id")
       .notNull()
-      .references(() => doctorsTable.id, { onDelete: "cascade" }),
+      .references(() => professionalsTable.id, { onDelete: "cascade" }),
     status: text("status").default("scheduled"),
     notes: text("notes"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -296,7 +298,7 @@ export const attendancesTable = pgTable(
       .references(() => patientsTable.id, { onDelete: "cascade" }),
     doctorId: uuid("doctor_id")
       .notNull()
-      .references(() => doctorsTable.id, { onDelete: "cascade" }),
+      .references(() => professionalsTable.id, { onDelete: "cascade" }),
     type: attendanceTypeEnum("type").notNull().default("scheduled"),
     status: attendanceStatusEnum("status").notNull().default("waiting"),
     scheduledStartTime: timestamp("scheduled_start_time"),
@@ -506,7 +508,7 @@ export const questionnairesTable = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     doctorId: uuid("doctor_id")
       .notNull()
-      .references(() => doctorsTable.id, { onDelete: "cascade" }),
+      .references(() => professionalsTable.id, { onDelete: "cascade" }),
     templateId: uuid("template_id")
       .notNull()
       .references(() => questionnaireTemplatesTable.id, {
@@ -576,7 +578,7 @@ export const rolePermissionsTable = pgTable(
 
 export const usersTableRelations = relations(usersTable, ({ many }) => ({
   usersToClinics: many(usersToClinicsTable),
-  doctors: many(doctorsTable),
+  professionals: many(professionalsTable),
 }));
 
 export const usersToClinicsTableRelations = relations(
@@ -594,7 +596,7 @@ export const usersToClinicsTableRelations = relations(
 );
 
 export const clinicsTableRelations = relations(clinicsTable, ({ many }) => ({
-  doctors: many(doctorsTable),
+  professionals: many(professionalsTable),
   patients: many(patientsTable),
   appointments: many(appointmentsTable),
   usersToClinics: many(usersToClinicsTable),
@@ -602,15 +604,15 @@ export const clinicsTableRelations = relations(clinicsTable, ({ many }) => ({
   questionnaireTemplates: many(questionnaireTemplatesTable),
 }));
 
-export const doctorsTableRelations = relations(
-  doctorsTable,
+export const professionalsTableRelations = relations(
+  professionalsTable,
   ({ many, one }) => ({
     clinic: one(clinicsTable, {
-      fields: [doctorsTable.clinicId],
+      fields: [professionalsTable.clinicId],
       references: [clinicsTable.id],
     }),
     user: one(usersTable, {
-      fields: [doctorsTable.userId],
+      fields: [professionalsTable.userId],
       references: [usersTable.id],
     }),
     appointments: many(appointmentsTable),
@@ -642,9 +644,9 @@ export const appointmentsTableRelations = relations(
       fields: [appointmentsTable.patientId],
       references: [patientsTable.id],
     }),
-    doctor: one(doctorsTable, {
+    doctor: one(professionalsTable, {
       fields: [appointmentsTable.doctorId],
-      references: [doctorsTable.id],
+      references: [professionalsTable.id],
     }),
     attendance: one(attendancesTable, {
       fields: [appointmentsTable.id],
@@ -668,9 +670,9 @@ export const attendancesTableRelations = relations(
       fields: [attendancesTable.patientId],
       references: [patientsTable.id],
     }),
-    doctor: one(doctorsTable, {
+    doctor: one(professionalsTable, {
       fields: [attendancesTable.doctorId],
-      references: [doctorsTable.id],
+      references: [professionalsTable.id],
     }),
     vitalSigns: many(vitalSignsTable),
     prescriptions: many(prescriptionsTable),
@@ -756,9 +758,9 @@ export const questionnaireTemplateFieldsTableRelations = relations(
 export const questionnairesTableRelations = relations(
   questionnairesTable,
   ({ one, many }) => ({
-    doctor: one(doctorsTable, {
+    doctor: one(professionalsTable, {
       fields: [questionnairesTable.doctorId],
-      references: [doctorsTable.id],
+      references: [professionalsTable.id],
     }),
     template: one(questionnaireTemplatesTable, {
       fields: [questionnairesTable.templateId],

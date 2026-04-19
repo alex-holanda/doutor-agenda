@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import dayjs from "dayjs";
 import { useAction } from "next-safe-action/hooks";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -32,42 +33,38 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { doctorsTable, patientsTable } from "@/db/schema";
+import { professionalsTable, patientsTable } from "@/db/schema";
 
 const formSchema = z.object({
   patientId: z.string().min(1, {
     message: "Paciente é obrigatório.",
   }),
   doctorId: z.string().min(1, {
-    message: "Médico é obrigatório.",
-  }),
-  type: z.enum(["walk_in", "emergency"], {
-    message: "Tipo de atendimento é obrigatório.",
+    message: "Profissional é obrigatório.",
   }),
   chiefComplaint: z.string().optional(),
   notes: z.string().optional(),
 });
 
-interface AddWalkInAttendanceFormProps {
+interface AddEmergencyAttendanceFormProps {
   isOpen: boolean;
   patients: (typeof patientsTable.$inferSelect)[];
-  doctors: (typeof doctorsTable.$inferSelect)[];
+  professionals: (typeof professionalsTable.$inferSelect)[];
   onSuccess?: () => void;
 }
 
-const AddWalkInAttendanceForm = ({
+const AddEmergencyAttendanceForm = ({
   isOpen,
   patients,
-  doctors,
+  professionals,
   onSuccess,
-}: AddWalkInAttendanceFormProps) => {
+}: AddEmergencyAttendanceFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     shouldUnregister: true,
     resolver: zodResolver(formSchema),
     defaultValues: {
       patientId: "",
       doctorId: "",
-      type: "walk_in",
       chiefComplaint: "",
       notes: "",
     },
@@ -78,7 +75,6 @@ const AddWalkInAttendanceForm = ({
       form.reset({
         patientId: "",
         doctorId: "",
-        type: "walk_in",
         chiefComplaint: "",
         notes: "",
       });
@@ -87,7 +83,7 @@ const AddWalkInAttendanceForm = ({
 
   const createAttendanceAction = useAction(addAttendance, {
     onSuccess: () => {
-      toast.success("Atendimento iniciado com sucesso.");
+      toast.success("Atendimento de emergência iniciado com sucesso.");
       onSuccess?.();
     },
     onError: (error) => {
@@ -97,46 +93,23 @@ const AddWalkInAttendanceForm = ({
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    createAttendanceAction.execute(values);
+    createAttendanceAction.execute({
+      ...values,
+      type: "emergency",
+    });
   };
 
   return (
     <DialogContent className="sm:max-w-[500px] max-h-[calc(100vh-2rem)] overflow-y-auto">
       <DialogHeader>
-        <DialogTitle>Novo atendimento</DialogTitle>
+        <DialogTitle> Emergência</DialogTitle>
         <DialogDescription>
-          Registre um atendimento de emergência ou avulso.
+          Registre um atendimento de emergência.
         </DialogDescription>
       </DialogHeader>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          {/* Tipo de Atendimento */}
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tipo de atendimento</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Selecione o tipo" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="walk_in">Avulso</SelectItem>
-                    <SelectItem value="emergency">Emergência</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           {/* Paciente */}
           <FormField
             control={form.control}
@@ -163,13 +136,13 @@ const AddWalkInAttendanceForm = ({
             )}
           />
 
-          {/* Médico */}
+          {/* Profissional */}
           <FormField
             control={form.control}
             name="doctorId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Médico</FormLabel>
+                <FormLabel>Profissional</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger className="w-full">
@@ -177,9 +150,9 @@ const AddWalkInAttendanceForm = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {doctors.map((doctor) => (
-                      <SelectItem key={doctor.id} value={doctor.id}>
-                        {doctor.name} - {doctor.specialty}
+                    {professionals.map((professional) => (
+                      <SelectItem key={professional.id} value={professional.id}>
+                        {professional.name} - {professional.specialty}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -233,7 +206,7 @@ const AddWalkInAttendanceForm = ({
             <Button type="submit" disabled={createAttendanceAction.isPending}>
               {createAttendanceAction.isPending
                 ? "Iniciando..."
-                : "Iniciar atendimento"}
+                : "Iniciar emergência"}
             </Button>
           </DialogFooter>
         </form>
@@ -242,4 +215,4 @@ const AddWalkInAttendanceForm = ({
   );
 };
 
-export default AddWalkInAttendanceForm;
+export default AddEmergencyAttendanceForm;

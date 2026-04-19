@@ -1,36 +1,36 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Plus, Siren } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { doctorsTable, patientsTable } from "@/db/schema";
-import AddWalkInAttendanceForm from "./add-attendance-form";
+import { professionalsTable, patientsTable } from "@/db/schema";
+import AddEmergencyAttendanceForm from "./add-attendance-form";
 
 interface AddAttendanceButtonProps {
   patients: (typeof patientsTable.$inferSelect)[];
-  doctors: (typeof doctorsTable.$inferSelect)[];
+  professionals: (typeof professionalsTable.$inferSelect)[];
 }
 
 const AddAttendanceButton = ({
   patients,
-  doctors,
+  professionals,
 }: AddAttendanceButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="h-4 w-4" />
-          Novo atendimento
+        <Button variant="destructive">
+          <Siren className="h-4 w-4" />
+          Emergência
         </Button>
       </DialogTrigger>
-      <AddWalkInAttendanceForm
+      <AddEmergencyAttendanceForm
         isOpen={isOpen}
         patients={patients}
-        doctors={doctors}
+        professionals={professionals}
         onSuccess={() => setIsOpen(false)}
       />
     </Dialog>

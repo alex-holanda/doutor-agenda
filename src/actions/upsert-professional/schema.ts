@@ -6,8 +6,10 @@ export const upsertDoctorSchema = z
     name: z.string().trim().min(1, {
       message: "Nome é obrigatório.",
     }),
+    role: z.enum(["doctor", "nurse"]),
+    registerNumber: z.string().optional(),
     specialty: z.string().trim().min(1, {
-      message: "Especialidade é obrigatória.",
+      message: "Especialidade/Função é obrigatória.",
     }),
     appointmentPriceInCents: z.number().min(1, {
       message: "Preço da consulta é obrigatório.",

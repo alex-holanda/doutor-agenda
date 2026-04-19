@@ -18,7 +18,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { attendanceTableColumns } from "./_components/table-columns";
 import { db } from "@/db";
 import AddAttendanceButton from "./_components/add-attendence-button";
-import { attendancesTable, doctorsTable, patientsTable } from "@/db/schema";
+import { attendancesTable, professionalsTable, patientsTable } from "@/db/schema";
 import { and, asc, eq, gte, lte, or } from "drizzle-orm";
 import dayjs from "dayjs";
 
@@ -95,8 +95,8 @@ export default async function AttendancesPage({
     db.query.patientsTable.findMany({
       where: eq(patientsTable.clinicId, session!.user.clinic!.id),
     }),
-    db.query.doctorsTable.findMany({
-      where: eq(doctorsTable.clinicId, session!.user.clinic!.id),
+    db.query.professionalsTable.findMany({
+      where: eq(professionalsTable.clinicId, session!.user.clinic!.id),
     }),
   ]);
 
@@ -132,7 +132,7 @@ export default async function AttendancesPage({
             </PageDescription>
           </PageHeaderContent>
           <PageActions>
-            <AddAttendanceButton doctors={doctors} patients={patients} />
+            <AddAttendanceButton professionals={doctors} patients={patients} />
           </PageActions>
         </PageHeader>
         <div className="flex flex-wrap gap-2 pb-4">

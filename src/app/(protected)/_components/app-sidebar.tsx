@@ -60,8 +60,8 @@ const schedulingItems = [
 
 const registerItems = [
   {
-    title: "Médicos",
-    url: "/doctors",
+    title: "Profissionais",
+    url: "/professionals",
     icon: Stethoscope,
   },
   {

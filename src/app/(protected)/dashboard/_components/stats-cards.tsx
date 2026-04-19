@@ -38,7 +38,7 @@ const StatsCards = ({
       icon: UserIcon,
     },
     {
-      title: "Médicos",
+      title: "Profissionais",
       value: totalDoctors.toString(),
       icon: UsersIcon,
     },

@@ -5,14 +5,14 @@ import utc from "dayjs/plugin/utc";
 import { revalidatePath } from "next/cache";
 
 import { db } from "@/db";
-import { doctorsTable } from "@/db/schema";
+import { professionalsTable } from "@/db/schema";
 import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 
 import { upsertDoctorSchema } from "./schema";
 
 dayjs.extend(utc);
 
-export const upsertDoctor = protectedWithClinicActionClient
+export const upsertProfessional = protectedWithClinicActionClient
   .schema(upsertDoctorSchema)
   .action(async ({ parsedInput, ctx }) => {
     const availableFromTime = parsedInput.availableFromTime; // 15:30:00
@@ -30,7 +30,7 @@ export const upsertDoctor = protectedWithClinicActionClient
       .utc();
 
     await db
-      .insert(doctorsTable)
+      .insert(professionalsTable)
       .values({
         ...parsedInput,
         id: parsedInput.id,
@@ -39,12 +39,12 @@ export const upsertDoctor = protectedWithClinicActionClient
         availableToTime: availableToTimeUTC.format("HH:mm:ss"),
       })
       .onConflictDoUpdate({
-        target: [doctorsTable.id],
+        target: [professionalsTable.id],
         set: {
           ...parsedInput,
           availableFromTime: availableFromTimeUTC.format("HH:mm:ss"),
           availableToTime: availableToTimeUTC.format("HH:mm:ss"),
         },
       });
-    revalidatePath("/doctors");
+    revalidatePath("/professionals");
   });

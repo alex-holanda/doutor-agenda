@@ -10,7 +10,7 @@ import {
   questionnairesTable,
   questionnaireTemplatesTable,
   questionnaireTemplateFieldsTable,
-  doctorsTable,
+  professionalsTable,
   questionnaireResponsesTable,
 } from "@/db/schema";
 import { auth } from "@/lib/auth";
@@ -34,10 +34,10 @@ export async function createQuestionnaire(
 
   const validated = questionnaireSchema.parse(data);
 
-  const doctor = await db.query.doctorsTable.findFirst({
+  const doctor = await db.query.professionalsTable.findFirst({
     where: and(
-      eq(doctorsTable.id, validated.doctorId),
-      eq(doctorsTable.clinicId, session.user.clinic.id),
+      eq(professionalsTable.id, validated.doctorId),
+      eq(professionalsTable.clinicId, session.user.clinic.id),
     ),
   });
 
@@ -93,8 +93,8 @@ export async function getMyQuestionnaires(search?: string, doctorId?: string) {
   }
 
   // Buscar todos os médicos da clínica
-  const clinicDoctors = await db.query.doctorsTable.findMany({
-    where: eq(doctorsTable.clinicId, session.user.clinic.id),
+  const clinicDoctors = await db.query.professionalsTable.findMany({
+    where: eq(professionalsTable.clinicId, session.user.clinic.id),
   });
 
   const doctorIds = clinicDoctors.map((d) => d.id);
@@ -192,8 +192,8 @@ export async function getQuestionnaireById(id: string) {
     throw new Error("Questionário não encontrado");
   }
 
-  const doctor = await db.query.doctorsTable.findFirst({
-    where: eq(doctorsTable.id, questionnaire.doctorId),
+  const doctor = await db.query.professionalsTable.findFirst({
+    where: eq(professionalsTable.id, questionnaire.doctorId),
   });
 
   const template = await db.query.questionnaireTemplatesTable.findFirst({
@@ -275,8 +275,8 @@ export async function getDoctorsForSelect() {
     throw new Error("Não autorizado");
   }
 
-  const doctors = await db.query.doctorsTable.findMany({
-    where: eq(doctorsTable.clinicId, session.user.clinic.id),
+  const doctors = await db.query.professionalsTable.findMany({
+    where: eq(professionalsTable.clinicId, session.user.clinic.id),
     orderBy: (doctors, { asc }) => [asc(doctors.name)],
   });
 
@@ -309,8 +309,8 @@ export async function getMyDoctors() {
     throw new Error("Não autorizado");
   }
 
-  const doctors = await db.query.doctorsTable.findMany({
-    where: eq(doctorsTable.clinicId, session.user.clinic.id),
+  const doctors = await db.query.professionalsTable.findMany({
+    where: eq(professionalsTable.clinicId, session.user.clinic.id),
     orderBy: (doctors, { asc }) => [asc(doctors.name)],
   });
 
@@ -326,8 +326,8 @@ export async function getCurrentDoctor() {
     throw new Error("Não autorizado");
   }
 
-  const doctor = await db.query.doctorsTable.findFirst({
-    where: eq(doctorsTable.userId, session.user.id),
+  const doctor = await db.query.professionalsTable.findFirst({
+    where: eq(professionalsTable.userId, session.user.id),
   });
 
   return doctor;
