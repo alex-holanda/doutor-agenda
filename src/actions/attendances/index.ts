@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { eq, and } from "drizzle-orm";
 
 import { db } from "@/db";
+import dayjs from "dayjs";
 import {
   vitalSignsTable,
   physicalExamsTable,
@@ -16,6 +17,7 @@ import {
   appointmentsTable,
   questionnairesTable,
   questionnaireTemplateFieldsTable,
+  professionalsTable,
 } from "@/db/schema";
 import { auth } from "@/lib/auth";
 
@@ -410,14 +412,6 @@ export async function savePrescription(attendanceId: string, data: any) {
     throw new Error("Atendimento não encontrado");
   }
 
-  if (attendance.status === "cancelled") {
-    throw new Error("Atendimento cancelado não pode ser editado");
-  }
-
-  if (attendance.status === "completed") {
-    throw new Error("Atendimento já foi finalizado");
-  }
-
   const existing = await db.query.prescriptionsTable.findFirst({
     where: eq(prescriptionsTable.attendanceId, attendanceId),
   });
@@ -429,8 +423,56 @@ export async function savePrescription(attendanceId: string, data: any) {
   const orientations = data.orientations?.trim() || null;
 
   let returnDate = null;
-  if (data.returnDate && data.returnDate !== "") {
-    returnDate = new Date(data.returnDate);
+
+  if (data.returnDate && data.returnDate !== "" && data.returnTime) {
+    const [hours, minutes, seconds = "00"] = data.returnTime.split(":");
+
+    const [year, month, day] = data.returnDate.split("-").map(Number);
+
+    returnDate = new Date(
+      year,
+      month - 1,
+      day,
+      parseInt(hours),
+      parseInt(minutes),
+      parseInt(seconds),
+    );
+  }
+
+  let appointmentId = existing?.appointmentId || null;
+
+  if (returnDate) {
+    const professional = await db.query.professionalsTable.findFirst({
+      where: eq(professionalsTable.id, attendance.doctorId),
+    });
+
+    const appointmentPrice = professional?.appointmentPriceInCents ?? 0;
+
+    if (appointmentId) {
+      await db
+        .update(appointmentsTable)
+        .set({
+          date: returnDate,
+          appointmentPriceInCents: appointmentPrice,
+          status: "scheduled",
+          notes: "Retorno agendado",
+        })
+        .where(eq(appointmentsTable.id, appointmentId));
+    } else {
+      const newAppointment = await db
+        .insert(appointmentsTable)
+        .values({
+          clinicId: attendance.clinicId,
+          patientId: attendance.patientId,
+          doctorId: attendance.doctorId,
+          date: returnDate,
+          appointmentPriceInCents: appointmentPrice,
+          status: "scheduled",
+          notes: "Retorno agendado",
+        })
+        .returning();
+      appointmentId = newAppointment[0].id;
+    }
   }
 
   if (existing) {
@@ -441,12 +483,14 @@ export async function savePrescription(attendanceId: string, data: any) {
         exams,
         orientations,
         returnDate,
+        appointmentId,
         updatedAt: now,
       })
       .where(eq(prescriptionsTable.id, existing.id));
   } else {
     await db.insert(prescriptionsTable).values({
       attendanceId,
+      appointmentId,
       medications,
       exams,
       orientations,
@@ -457,6 +501,7 @@ export async function savePrescription(attendanceId: string, data: any) {
   }
 
   revalidatePath(`/attendances/${attendanceId}`);
+  revalidatePath(`/appointments`);
   return { success: true };
 }
 

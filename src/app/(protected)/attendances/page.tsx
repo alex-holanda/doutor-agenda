@@ -18,7 +18,11 @@ import { DataTable } from "@/components/ui/data-table";
 import { attendanceTableColumns } from "./_components/table-columns";
 import { db } from "@/db";
 import AddAttendanceButton from "./_components/add-attendence-button";
-import { attendancesTable, professionalsTable, patientsTable } from "@/db/schema";
+import {
+  attendancesTable,
+  professionalsTable,
+  patientsTable,
+} from "@/db/schema";
 import { and, asc, eq, gte, lte, or } from "drizzle-orm";
 import dayjs from "dayjs";
 
@@ -45,14 +49,14 @@ export default async function AttendancesPage({
 
   const baseFilter = and(
     eq(attendancesTable.clinicId, session!.user.clinic!.id),
-    gte(attendancesTable.createdAt, today),
-    lte(attendancesTable.createdAt, tomorrow),
   );
 
   let whereClause;
   if (!status) {
     whereClause = and(
       baseFilter,
+      gte(attendancesTable.createdAt, today),
+      lte(attendancesTable.createdAt, tomorrow),
       or(
         eq(attendancesTable.status, "waiting"),
         eq(attendancesTable.status, "in_progress"),

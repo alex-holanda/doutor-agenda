@@ -171,7 +171,7 @@ const AddAppointmentForm = ({
   const isDateTimeEnabled = selectedPatientId && selectedDoctorId;
 
   return (
-    <DialogContent className="sm:max-w-125 max-h-[calc(100vh-2rem)] overflow-y-auto">
+    <DialogContent className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-125">
       <DialogHeader>
         <DialogTitle>Novo agendamento</DialogTitle>
         <DialogDescription>
@@ -265,7 +265,8 @@ const AddAppointmentForm = ({
             control={form.control}
             name="date"
             render={({ field }) => {
-              const isToday = field.value && dayjs(field.value).isSame(dayjs(), "day");
+              const isToday =
+                field.value && dayjs(field.value).isSame(dayjs(), "day");
               return (
                 <FormItem className="flex flex-col">
                   <FormLabel>Data</FormLabel>
@@ -299,7 +300,6 @@ const AddAppointmentForm = ({
                           const isPast = dayjs(date).isBefore(dayjs(), "day");
                           return isPast || !isDateAvailable(date);
                         }}
-                        initialFocus
                       />
                     </PopoverContent>
                   </Popover>

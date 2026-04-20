@@ -106,6 +106,8 @@ export default async function AttendancePage({ params }: AttendancePageProps) {
               attendanceId={attendance.id}
               patientName={attendance.patient.name}
               doctorId={attendance.doctor.id}
+              doctorName={attendance.doctor.name}
+              appointmentDate={attendance.appointment?.createdAt?.toISOString()}
               initialStatus={attendance.status}
               chiefComplaint={attendance.chiefComplaint}
             />

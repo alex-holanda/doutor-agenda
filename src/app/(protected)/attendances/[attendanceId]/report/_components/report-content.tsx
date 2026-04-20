@@ -496,9 +496,6 @@ export function ReportContent({
                                 <p className="text-muted-foreground text-sm">
                                   Dados:
                                 </p>
-                                <pre className="bg-muted mt-1 overflow-auto rounded p-2 text-xs">
-                                  {JSON.stringify(q.responseData, null, 2)}
-                                </pre>
                               </div>
                             )}
                         </div>

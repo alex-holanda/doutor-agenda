@@ -33,6 +33,8 @@ interface AttendanceFlowProps {
   attendanceId: string;
   patientName: string;
   doctorId: string;
+  doctorName?: string;
+  appointmentDate?: string;
   initialStatus: string;
   chiefComplaint: string | null;
 }
@@ -41,6 +43,8 @@ export function AttendanceFlow({
   attendanceId,
   patientName,
   doctorId,
+  doctorName,
+  appointmentDate,
   initialStatus,
   chiefComplaint,
 }: AttendanceFlowProps) {
@@ -378,7 +382,12 @@ export function AttendanceFlow({
             />
           )}
         {currentStepInfo.id === "prescription" && (
-          <PrescriptionStep initialData={savedData.prescription} />
+          <PrescriptionStep
+            initialData={savedData.prescription}
+            doctorName={doctorName}
+            appointmentDate={appointmentDate}
+            doctorId={doctorId}
+          />
         )}
         {currentStepInfo.id === "certificate" && (
           <CertificateStep initialData={savedData.certificate} />

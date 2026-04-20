@@ -372,6 +372,9 @@ export const prescriptionsTable = pgTable(
     attendanceId: uuid("attendance_id")
       .notNull()
       .references(() => attendancesTable.id, { onDelete: "cascade" }),
+    appointmentId: uuid("appointment_id").references(
+      () => appointmentsTable.id,
+    ),
     status: prescriptionStatusEnum("status").default("finalized"),
     medications: text("medications"),
     exams: text("exams"),
@@ -383,7 +386,10 @@ export const prescriptionsTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => [index("idx_prescriptions_attendance_id").on(table.attendanceId)],
+  (table) => [
+    index("idx_prescriptions_attendance_id").on(table.attendanceId),
+    index("idx_prescriptions_appointment_id").on(table.appointmentId),
+  ],
 );
 
 export const medicalCertificatesTable = pgTable(
@@ -709,6 +715,10 @@ export const prescriptionsTableRelations = relations(
     attendance: one(attendancesTable, {
       fields: [prescriptionsTable.attendanceId],
       references: [attendancesTable.id],
+    }),
+    appointment: one(appointmentsTable, {
+      fields: [prescriptionsTable.appointmentId],
+      references: [appointmentsTable.id],
     }),
   }),
 );
