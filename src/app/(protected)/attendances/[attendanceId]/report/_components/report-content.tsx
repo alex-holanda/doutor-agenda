@@ -3,17 +3,8 @@
 
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import {
-  Printer,
-  FileText,
-  Pill,
-  Activity,
-  ClipboardList,
-  Heart,
-  Stethoscope,
-  User,
-  Calendar,
-} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { FileText, Pill, Activity, ClipboardList, Heart, Stethoscope, User, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -37,17 +28,13 @@ export function ReportContent({
   certificate,
   questionnaires,
 }: ReportContentProps) {
-  const handlePrint = () => {
-    window.print();
-  };
+  const router = useRouter();
 
   return (
     <div className="space-y-6">
-      {/* Botão de impressão */}
-      <div className="flex justify-end print:hidden">
-        <Button onClick={handlePrint} variant="outline">
-          <Printer className="mr-2 h-4 w-4" />
-          Imprimir Relatório
+      <div className="flex justify-end">
+        <Button variant="outline" onClick={() => router.push(`/attendances/${attendance.id}/print`)}>
+          Imprimir
         </Button>
       </div>
 
