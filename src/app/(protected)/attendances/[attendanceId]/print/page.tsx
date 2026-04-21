@@ -79,10 +79,6 @@ export default async function PrintPage({ params }: PrintPageProps) {
 
   const attendanceData = {
     ...attendance,
-    createdAt: attendance.createdAt?.toISOString(),
-    updatedAt: attendance.updatedAt?.toISOString(),
-    actualStartTime: attendance.actualStartTime?.toISOString(),
-    actualEndTime: attendance.actualEndTime?.toISOString(),
   };
 
   return (

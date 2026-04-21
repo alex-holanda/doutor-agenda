@@ -1,5 +1,7 @@
 // src/app/(protected)/attendances/[attendanceId]/print/_components/print-content.tsx
 
+import dayjs from "dayjs";
+import "dayjs/locale/pt-br";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Separator } from "@/components/ui/separator";
@@ -19,20 +21,20 @@ export function PrintContent({
   prescription,
   questionnaires,
 }: PrintContentProps) {
+  dayjs.locale("pt-br");
+
   const attendanceDate = attendance?.createdAt
-    ? format(new Date(attendance.createdAt), "dd/MM/yyyy 'às' HH:mm", {
-        locale: ptBR,
-      })
+    ? dayjs(attendance.createdAt).format("DD/MM/YYYY 'às' HH:mm")
     : "";
 
   const attendanceDateOnly = attendance?.createdAt
-    ? format(new Date(attendance.createdAt), "dd/MM/yyyy", { locale: ptBR })
+    ? dayjs(attendance.createdAt).format("DD/MM/YYYY")
     : "";
 
   const formatReturnDate = (date: any) => {
     if (!date) return null;
     try {
-      return format(new Date(date), "dd/MM/yyyy", { locale: ptBR });
+      return dayjs(date).format("DD/MM/YYYY");
     } catch {
       return null;
     }
